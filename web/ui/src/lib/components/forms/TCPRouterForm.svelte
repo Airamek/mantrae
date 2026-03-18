@@ -162,6 +162,38 @@
 		</div>
 	</div>
 
+	<!-- TLS Options -->
+	{#if config.tls}
+		<div class="flex flex-col gap-2">
+			<Label for="tlsOptions" class="mr-2">TLS Options</Label>
+			<Input
+				id="tlsOptions"
+				value={config.tls?.options}
+				placeholder="modern-tls"
+				oninput={(e) => {
+					const input = e.target as HTMLInputElement;
+					if (!config.tls) config.tls = {} as RouterTCPTLSConfig;
+					config.tls.options = input.value || undefined;
+				}}
+			/>
+		</div>
+
+		<div class="flex items-center justify-between rounded-lg border p-3">
+			<div class="space-y-1">
+				<Label class="text-sm">TLS Passthrough</Label>
+				<p class="text-xs text-muted-foreground">Forward TLS connections without terminating them</p>
+			</div>
+
+			<CustomSwitch
+				checked={config.tls?.passthrough || false}
+				onCheckedChange={(checked) => {
+					if (!config.tls) config.tls = {} as RouterTCPTLSConfig;
+					config.tls.passthrough = checked;
+				}}
+			/>
+		</div>
+	{/if}
+
 	<!-- Rule -->
 	{#if data.type === ProtocolType.TCP}
 		<RuleEditor bind:rule={config.rule} bind:type={data.type} />
