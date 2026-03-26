@@ -42,6 +42,22 @@
 	let serviceMode = $state<'new' | 'existing'>('new');
 	let selectedServiceId = $state('');
 	const serviceList = service.list();
+
+	// Add internal Traefik services alongside database services
+	const internalServices: Array<{ id: string; name: string; type: ProtocolType }> = [
+		{ id: 'api@internal', name: 'api@internal', type: ProtocolType.HTTP },
+		{ id: 'dashboard@internal', name: 'dashboard@internal', type: ProtocolType.HTTP },
+		{ id: 'ping@internal', name: 'ping@internal', type: ProtocolType.HTTP }
+	];
+
+	let allServices = $derived.by(() => {
+		const dbServices = (serviceList.data ?? []).filter((item) => item.type === routerData.type);
+		const internal = internalServices.filter((s) => s.type === routerData.type);
+		return [
+			...dbServices,
+			...internal.filter((s) => !dbServices.some((db) => db.name === s.name))
+		] as Array<{ id: string; name: string; type: ProtocolType }>;
+	});
 	let getService = $derived(service.get(routerData.name, routerData.type));
 	$effect(() => {
 		if (!data) return;
@@ -55,21 +71,34 @@
 		const cfg = unmarshalConfig(incomingRouter.config) as Record<string, any>;
 		const existingName = cfg?.service;
 		if (existingName && existingName !== incomingRouter.name) {
-			const existing = serviceList.data.find(
+			const existing = serviceList.data?.find(
 				(item) => item.name === existingName && item.type === incomingRouter.type
 			);
 			if (existing) {
 				serviceMode = 'existing';
 				selectedServiceId = existing.id;
 				serviceData = { ...existing };
+			} else {
+				// Check if it's an internal service
+				const internalService = internalServices.find(
+					(s) => s.name === existingName && s.type === incomingRouter.type
+				);
+				if (internalService) {
+					serviceMode = 'existing';
+					selectedServiceId = internalService.id;
+					// Don't set serviceData for internal services
+				}
 			}
 		}
 	});
 	$effect(() => {
 		if (serviceMode === 'existing' && selectedServiceId && serviceList.isSuccess) {
-			const existing = serviceList.data.find((item) => item.id === selectedServiceId);
-			if (existing) {
-				serviceData = { ...existing };
+			const isInternal = internalServices.some((s) => s.id === selectedServiceId);
+			if (!isInternal) {
+				const existing = serviceList.data.find((item) => item.id === selectedServiceId);
+				if (existing) {
+					serviceData = { ...existing };
+				}
 			}
 		} else if (data?.id && getService.isSuccess && getService.data) {
 			serviceData = { ...getService.data };
@@ -88,16 +117,29 @@
 	const createService = service.create();
 	const updateService = service.update();
 	function onsubmit() {
-		if (serviceMode === 'existing' && selectedServiceId && serviceList.isSuccess) {
-			const existing = serviceList.data.find((item) => item.id === selectedServiceId);
+		if (serviceMode === 'existing' && selectedServiceId && allServices.length) {
+			const existing = allServices.find((item) => item.id === selectedServiceId);
 			if (existing) {
-				serviceData = { ...existing };
-				const cfg = unmarshalConfig(routerData.config) as Record<string, any>;
-				if (cfg) {
-					cfg.service = existing.name;
-					routerData.config = marshalConfig(cfg);
+				// For internal services, just set the service name
+				const isInternal = internalServices.some((s) => s.id === existing.id);
+				if (isInternal) {
+					const cfg = unmarshalConfig(routerData.config) as Record<string, any>;
+					if (cfg) {
+						cfg.service = existing.name;
+						routerData.config = marshalConfig(cfg);
+					} else {
+						routerData.config = marshalConfig({ service: existing.name });
+					}
 				} else {
-					routerData.config = marshalConfig({ service: existing.name });
+					// For database services, update serviceData
+					serviceData = { ...(existing as Service) };
+					const cfg = unmarshalConfig(routerData.config) as Record<string, any>;
+					if (cfg) {
+						cfg.service = existing.name;
+						routerData.config = marshalConfig(cfg);
+					} else {
+						routerData.config = marshalConfig({ service: existing.name });
+					}
 				}
 			}
 		} else {
@@ -398,16 +440,16 @@
 								>
 									<Select.Trigger class="w-full">
 										<span class="truncate">
-											{(serviceList.data?.find((item) => item.id === selectedServiceId)?.name) || 'Choose a service'}
+											{allServices.find((item) => item.id === selectedServiceId)?.name || 'Choose a service'}
 										</span>
 									</Select.Trigger>
 									<Select.Content>
-										{#each (serviceList.data ?? []).filter((item) => item.type === routerData.type) as item (item.id)}
+										{#each allServices as item (item.id)}
 											<Select.Item value={item.id}>
 												{item.name}
 											</Select.Item>
 										{/each}
-										{#if !(serviceList.data?.filter((item) => item.type === routerData.type)?.length)}
+										{#if !allServices.length}
 											<Select.Item value="" disabled>
 												No services available for this protocol
 											</Select.Item>
