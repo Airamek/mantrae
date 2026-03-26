@@ -10,7 +10,7 @@
 	import { Label } from '$lib/components/ui/label';
 	import { type Router } from '$lib/gen/mantrae/v1/router_pb';
 	import { type Service } from '$lib/gen/mantrae/v1/service_pb';
-	import { protocolTypes, unmarshalConfig } from '$lib/types';
+	import { protocolTypes, marshalConfig, unmarshalConfig } from '$lib/types';
 	import { Bot, Server, StarIcon } from '@lucide/svelte';
 	import type {
 		Service as HTTPService,
@@ -39,15 +39,40 @@
 
 	let routerData = $state({} as Router);
 	let serviceData = $state({} as Service);
+	let serviceMode = $state<'new' | 'existing'>('new');
+	let selectedServiceId = $state('');
+	const serviceList = service.list();
 	let getService = $derived(service.get(routerData.name, routerData.type));
 	$effect(() => {
-		if (data) routerData = { ...data };
+		if (!data) return;
+
+		// Avoid recursive update while still evaluating router config from previous value.
+		const incomingRouter = { ...data };
+		routerData = incomingRouter;
+
+		if (!serviceList.isSuccess) return;
+
+		const cfg = unmarshalConfig(incomingRouter.config) as Record<string, any>;
+		const existingName = cfg?.service;
+		if (existingName && existingName !== incomingRouter.name) {
+			const existing = serviceList.data.find(
+				(item) => item.name === existingName && item.type === incomingRouter.type
+			);
+			if (existing) {
+				serviceMode = 'existing';
+				selectedServiceId = existing.id;
+				serviceData = { ...existing };
+			}
+		}
 	});
 	$effect(() => {
-		if (data?.id) {
-			if (getService.isSuccess && getService.data) {
-				serviceData = { ...getService.data };
+		if (serviceMode === 'existing' && selectedServiceId && serviceList.isSuccess) {
+			const existing = serviceList.data.find((item) => item.id === selectedServiceId);
+			if (existing) {
+				serviceData = { ...existing };
 			}
+		} else if (data?.id && getService.isSuccess && getService.data) {
+			serviceData = { ...getService.data };
 		}
 	});
 	$effect(() => {
@@ -63,19 +88,38 @@
 	const createService = service.create();
 	const updateService = service.update();
 	function onsubmit() {
-		serviceData.name = routerData.name;
-		serviceData.type = routerData.type;
-		serviceData.enabled = routerData.enabled;
+		if (serviceMode === 'existing' && selectedServiceId && serviceList.isSuccess) {
+			const existing = serviceList.data.find((item) => item.id === selectedServiceId);
+			if (existing) {
+				serviceData = { ...existing };
+				const cfg = unmarshalConfig(routerData.config) as Record<string, any>;
+				if (cfg) {
+					cfg.service = existing.name;
+					routerData.config = marshalConfig(cfg);
+				} else {
+					routerData.config = marshalConfig({ service: existing.name });
+				}
+			}
+		} else {
+			serviceData.name = routerData.name;
+			serviceData.type = routerData.type;
+			serviceData.enabled = routerData.enabled;
+		}
+
 		if (routerData.id) {
 			updateRouter.mutate({ ...routerData });
 		} else {
 			createRouter.mutate({ ...routerData });
 		}
-		if (serviceData.id) {
-			updateService.mutate({ ...serviceData });
-		} else {
-			createService.mutate({ ...serviceData });
+
+		if (serviceMode !== 'existing') {
+			if (serviceData.id) {
+				updateService.mutate({ ...serviceData });
+			} else {
+				createService.mutate({ ...serviceData });
+			}
 		}
+
 		open = false;
 	}
 
@@ -321,6 +365,60 @@
 							<Card.Description>Configure backend servers and load balancing</Card.Description>
 						</Card.Header>
 						<Card.Content class="flex flex-col gap-3">
+						<div class="grid grid-cols-2 gap-2">
+							<Button
+								variant={serviceMode === 'new' ? 'secondary' : 'outline'}
+								onclick={() => {
+									serviceMode = 'new';
+									selectedServiceId = '';
+								}}
+							>
+								Create new service
+							</Button>
+							<Button
+								variant={serviceMode === 'existing' ? 'secondary' : 'outline'}
+								onclick={() => {
+									serviceMode = 'existing';
+								}}
+							>
+								Use existing service
+							</Button>
+						</div>
+
+						{#if serviceMode === 'existing'}
+							<div class="flex flex-col gap-2">
+								<Label for="existing-service">Select Existing Service</Label>
+								<Select.Root
+									type="single"
+									value={selectedServiceId}
+									onValueChange={(value) => {
+										selectedServiceId = value;
+										serviceMode = value ? 'existing' : 'new';
+									}}
+								>
+									<Select.Trigger class="w-full">
+										<span class="truncate">
+											{(serviceList.data?.find((item) => item.id === selectedServiceId)?.name) || 'Choose a service'}
+										</span>
+									</Select.Trigger>
+									<Select.Content>
+										{#each (serviceList.data ?? []).filter((item) => item.type === routerData.type) as item (item.id)}
+											<Select.Item value={item.id}>
+												{item.name}
+											</Select.Item>
+										{/each}
+										{#if !(serviceList.data?.filter((item) => item.type === routerData.type)?.length)}
+											<Select.Item value="" disabled>
+												No services available for this protocol
+											</Select.Item>
+										{/if}
+									</Select.Content>
+								</Select.Root>
+								<p class="text-xs text-muted-foreground">Router will reference selected service and service edits are skipped.</p>
+							</div>
+						{/if}
+
+						{#if serviceMode === 'new'}
 							{#if routerData.type === ProtocolType.HTTP}
 								<HTTPServiceForm bind:service={serviceData} />
 							{/if}
@@ -329,6 +427,7 @@
 							{/if}
 							{#if routerData.type === ProtocolType.UDP}
 								<UDPServiceForm bind:service={serviceData} />
+							{/if}
 							{/if}
 						</Card.Content>
 					</Card.Root>
