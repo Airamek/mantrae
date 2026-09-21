@@ -3,6 +3,10 @@
 
 import { z } from 'zod';
 
+export const HTTPSchema = z.object({
+})
+export type HTTP = z.infer<typeof HTTPSchema>
+
 export const DomainSchema = z.object({
   main: z.string().optional(),
   sans: z.string().array().optional(),
@@ -16,15 +20,41 @@ export const RouterTLSConfigSchema = z.object({
 })
 export type RouterTLSConfig = z.infer<typeof RouterTLSConfigSchema>
 
+export const KubernetesIngressMetadataSchema = z.object({
+  namespace: z.string().optional(),
+  ingressName: z.string().optional(),
+  serviceName: z.string().optional(),
+  servicePort: z.string().optional(),
+})
+export type KubernetesIngressMetadata = z.infer<typeof KubernetesIngressMetadataSchema>
+
+export const ObservabilityMetadataSchema = z.object({
+  ingress: KubernetesIngressMetadataSchema.optional(),
+})
+export type ObservabilityMetadata = z.infer<typeof ObservabilityMetadataSchema>
+
 export const RouterObservabilityConfigSchema = z.object({
   accessLogs: z.boolean().optional(),
   metrics: z.boolean().optional(),
   tracing: z.boolean().optional(),
   traceVerbosity: z.string().optional(),
+  metadata: ObservabilityMetadataSchema.optional(),
 })
 export type RouterObservabilityConfig = z.infer<typeof RouterObservabilityConfigSchema>
 
-export const RouterSchema = z.object({
+export type Router = Router & {
+  entryPoints?: string[] | undefined,
+  middlewares?: string[] | undefined,
+  service?: string | undefined,
+  rule?: string | undefined,
+  parentRefs?: string[] | undefined,
+  ruleSyntax?: string | undefined,
+  priority?: number | undefined,
+  tls?: RouterTLSConfig | undefined,
+  observability?: RouterObservabilityConfig | undefined,
+}
+const RouterSchemaShape = {
+  ...RouterSchema.shape,
   entryPoints: z.string().array().optional(),
   middlewares: z.string().array().optional(),
   service: z.string().optional(),
@@ -34,8 +64,8 @@ export const RouterSchema = z.object({
   priority: z.number().optional(),
   tls: RouterTLSConfigSchema.optional(),
   observability: RouterObservabilityConfigSchema.optional(),
-})
-export type Router = z.infer<typeof RouterSchema>
+}
+export const RouterSchema: z.ZodType<Router> = z.object(RouterSchemaShape)
 
 export const CookieSchema = z.object({
   name: z.string().optional(),
@@ -97,6 +127,7 @@ export const ServersLoadBalancerSchema = z.object({
   passHostHeader: z.boolean().nullable(),
   responseForwarding: ResponseForwardingSchema.optional(),
   serversTransport: z.string().optional(),
+  nginxUpstreamHashBy: z.string().optional(),
 })
 export type ServersLoadBalancer = z.infer<typeof ServersLoadBalancerSchema>
 
@@ -144,14 +175,22 @@ export const MirroringSchema = z.object({
 })
 export type Mirroring = z.infer<typeof MirroringSchema>
 
+export const FailoverErrorSchema = z.object({
+  maxRequestBodyBytes: z.number().optional(),
+  status: z.string().array().optional(),
+})
+export type FailoverError = z.infer<typeof FailoverErrorSchema>
+
 export const FailoverSchema = z.object({
   service: z.string().optional(),
   fallback: z.string().optional(),
   healthCheck: HealthCheckSchema.optional(),
+  errors: FailoverErrorSchema.optional(),
 })
 export type Failover = z.infer<typeof FailoverSchema>
 
 export const ServiceSchema = z.object({
+  middlewares: z.string().array().optional(),
   loadBalancer: ServersLoadBalancerSchema.optional(),
   highestRandomWeight: HighestRandomWeightSchema.optional(),
   weighted: WeightedRoundRobinSchema.optional(),
@@ -249,11 +288,24 @@ export const HeadersSchema = z.object({
 })
 export type Headers = z.infer<typeof HeadersSchema>
 
+export const EncodedCharactersSchema = z.object({
+  allowEncodedSlash: z.boolean().optional(),
+  allowEncodedBackSlash: z.boolean().optional(),
+  allowEncodedNullCharacter: z.boolean().optional(),
+  allowEncodedSemicolon: z.boolean().optional(),
+  allowEncodedPercent: z.boolean().optional(),
+  allowEncodedQuestionMark: z.boolean().optional(),
+  allowEncodedHash: z.boolean().optional(),
+})
+export type EncodedCharacters = z.infer<typeof EncodedCharactersSchema>
+
 export const ErrorPageSchema = z.object({
   status: z.string().array().optional(),
   statusRewrites: z.record(z.string(), z.number()).optional(),
   service: z.string().optional(),
   query: z.string().optional(),
+  errorRequestHeaders: z.string().array().optional(),
+  nginxHeaders: z.record(z.string(), z.string().array()).optional().nullable(),
 })
 export type ErrorPage = z.infer<typeof ErrorPageSchema>
 
@@ -342,6 +394,7 @@ export const ForwardAuthSchema = z.object({
   maxBodySize: z.number().optional(),
   preserveLocationHeader: z.boolean().optional(),
   preserveRequestMethod: z.boolean().optional(),
+  authSigninURL: z.string().optional(),
 })
 export type ForwardAuth = z.infer<typeof ForwardAuthSchema>
 
@@ -357,6 +410,8 @@ export const BufferingSchema = z.object({
   maxResponseBodyBytes: z.number().optional(),
   memResponseBodyBytes: z.number().optional(),
   retryExpression: z.string().optional(),
+  disableRequestBuffer: z.boolean().optional(),
+  disableResponseBuffer: z.boolean().optional(),
 })
 export type Buffering = z.infer<typeof BufferingSchema>
 
@@ -419,7 +474,12 @@ export type PassTLSClientCert = z.infer<typeof PassTLSClientCertSchema>
 
 export const RetrySchema = z.object({
   attempts: z.number().optional(),
+  timeout: z.string().optional(),
   initialInterval: z.string().optional(),
+  maxRequestBodyBytes: z.number().optional(),
+  status: z.string().array().optional(),
+  disableRetryOnNetworkError: z.boolean().optional(),
+  retryNonIdempotentMethod: z.boolean().optional(),
 })
 export type Retry = z.infer<typeof RetrySchema>
 
@@ -457,6 +517,46 @@ export const URLRewriteSchema = z.object({
 })
 export type URLRewrite = z.infer<typeof URLRewriteSchema>
 
+export const AuthTLSPassCertificateToUpstreamSchema = z.object({
+  clientAuthType: z.string().optional(),
+  caFiles: z.string().array().optional(),
+})
+export type AuthTLSPassCertificateToUpstream = z.infer<typeof AuthTLSPassCertificateToUpstreamSchema>
+
+export const AuthSchema = z.object({
+  address: z.string().optional(),
+  method: z.string().optional(),
+  snippet: z.string().optional(),
+  authResponseHeaders: z.string().array().optional(),
+  authSigninURL: z.string().optional(),
+})
+export type Auth = z.infer<typeof AuthSchema>
+
+export const SnippetSchema = z.object({
+  serverSnippet: z.string().optional(),
+  configurationSnippet: z.string().optional(),
+  auth: AuthSchema.optional(),
+})
+export type Snippet = z.infer<typeof SnippetSchema>
+
+export const RewriteTargetSchema = z.object({
+  regex: z.string().optional(),
+  replacement: z.string().optional(),
+  xForwardedPrefix: z.string().optional(),
+})
+export type RewriteTarget = z.infer<typeof RewriteTargetSchema>
+
+export const UpstreamVHostSchema = z.object({
+  vHost: z.string().optional(),
+  vars: z.record(z.string(), z.string()).optional(),
+})
+export type UpstreamVHost = z.infer<typeof UpstreamVHostSchema>
+
+export const AppRootSchema = z.object({
+  path: z.string().optional(),
+})
+export type AppRoot = z.infer<typeof AppRootSchema>
+
 export const MiddlewareSchema = z.object({
   addPrefix: AddPrefixSchema.optional(),
   stripPrefix: StripPrefixSchema.optional(),
@@ -467,6 +567,7 @@ export const MiddlewareSchema = z.object({
   ipWhiteList: IPWhiteListSchema.optional(),
   ipAllowList: IPAllowListSchema.optional(),
   headers: HeadersSchema.optional(),
+  encodedCharacters: EncodedCharactersSchema.optional(),
   errors: ErrorPageSchema.optional(),
   rateLimit: RateLimitSchema.optional(),
   redirectRegex: RedirectRegexSchema.optional(),
@@ -487,6 +588,11 @@ export const MiddlewareSchema = z.object({
   responseHeaderModifier: HeaderModifierSchema.optional(),
   requestRedirect: RequestRedirectSchema.optional(),
   URLRewrite: URLRewriteSchema.optional(),
+  authTLSPassCertificateToUpstream: AuthTLSPassCertificateToUpstreamSchema.optional(),
+  snippet: SnippetSchema.optional(),
+  rewriteTarget: RewriteTargetSchema.optional(),
+  upstreamVHost: UpstreamVHostSchema.optional(),
+  appRoot: AppRootSchema.optional(),
 })
 export type Middleware = z.infer<typeof MiddlewareSchema>
 
@@ -523,6 +629,9 @@ export const ServersTransportSchema = z.object({
   insecureSkipVerify: z.boolean().optional(),
   rootCAs: z.string().array().optional(),
   certificates: CertificateSchema.array().optional(),
+  cipherSuites: z.string().array().optional(),
+  minVersion: z.string().optional(),
+  maxVersion: z.string().optional(),
   maxIdleConnsPerHost: z.number().optional(),
   forwardingTimeouts: ForwardingTimeoutsSchema.optional(),
   disableHTTP2: z.boolean().optional(),
@@ -532,6 +641,7 @@ export const ServersTransportSchema = z.object({
 export type ServersTransport = z.infer<typeof ServersTransportSchema>
 
 export const HTTPConfigurationSchema = z.object({
+  ...HTTPSchema.shape,
   routers: z.record(z.string(), RouterSchema).optional(),
   services: z.record(z.string(), ServiceSchema).optional(),
   middlewares: z.record(z.string(), MiddlewareSchema).optional(),
@@ -696,8 +806,9 @@ export const UDPConfigurationSchema = z.object({
 export type UDPConfiguration = z.infer<typeof UDPConfigurationSchema>
 
 export const CertAndStoresSchema = z.object({
+  ...CertificateSchema.shape,
   stores: z.string().array().optional(),
-}).merge(CertificateSchema)
+})
 export type CertAndStores = z.infer<typeof CertAndStoresSchema>
 
 export const ClientAuthSchema = z.object({

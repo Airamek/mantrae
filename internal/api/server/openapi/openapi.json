@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Mantrae",
-    "description": "Mantrae API Documentation\nFor more information, visit the [Documentation](https://mizuchilabs.github.io/mantrae/)\n",
+    "description": "Mantrae API Documentation\nFor more information, visit the [Documentation](https://mantrae.pages.dev)\n",
     "version": "v1.0.0",
     "contact": {
       "name": "Mantrae Support",
@@ -25,10 +25,16 @@
     "schemas": {
       "base64": {
         "type": "boolean",
+        "examples": [
+          false
+        ],
         "title": "base64",
         "description": "Specifies if the message query param is base64 encoded, which may be required for binary data"
       },
       "compression": {
+        "examples": [
+          "gzip"
+        ],
         "title": "compression",
         "enum": [
           "identity",
@@ -38,6 +44,9 @@
         "description": "Which compression algorithm to use for this request"
       },
       "connect": {
+        "examples": [
+          "v1"
+        ],
         "title": "connect",
         "enum": [
           "v1"
@@ -46,15 +55,18 @@
       },
       "connect-protocol-version": {
         "type": "number",
-        "title": "Connect-Protocol-Version",
-        "enum": [
+        "examples": [
           1
         ],
+        "title": "Connect-Protocol-Version",
         "description": "Define the version of the Connect protocol",
         "const": 1
       },
       "connect-timeout-header": {
         "type": "number",
+        "examples": [
+          1000
+        ],
         "title": "Connect-Timeout-Ms",
         "description": "Define the timeout, in ms"
       },
@@ -107,7 +119,7 @@
         "properties": {
           "type": {
             "type": "string",
-            "description": "A URL that acts as a globally unique identifier for the type of the serialized message. For example: `type.googleapis.com/google.rpc.ErrorInfo`. This is used to determine the schema of the data in the `value` field and is the discriminator for the `debug` field."
+            "description": "A URL that acts as a globally unique identifier for the type of the serialized message. For example: `type.googleapis.com/google.rpc.ErrorInfo`."
           },
           "value": {
             "type": "string",
@@ -115,18 +127,9 @@
             "description": "The Protobuf message, serialized as bytes and base64-encoded. The specific message type is identified by the `type` field."
           },
           "debug": {
-            "oneOf": [
-              {
-                "type": "object",
-                "title": "Any",
-                "additionalProperties": true,
-                "description": "Detailed error information."
-              }
-            ],
-            "discriminator": {
-              "propertyName": "type"
-            },
+            "type": "object",
             "title": "Debug",
+            "additionalProperties": true,
             "description": "Deserialized error detail payload. The 'type' field indicates the schema. This field is for easier debugging and should not be relied upon for application logic."
           }
         },
@@ -134,6 +137,9 @@
         "description": "Contains an arbitrary serialized message along with a @type that describes the type of the serialized message, with an additional debug field for ConnectRPC error details."
       },
       "encoding": {
+        "examples": [
+          "json"
+        ],
         "title": "encoding",
         "enum": [
           "proto",
@@ -142,20 +148,11 @@
         "description": "Define which encoding or 'Message-Codec' to use"
       },
       "google.protobuf.ListValue": {
-        "type": "object",
-        "properties": {
-          "values": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/google.protobuf.Value"
-            },
-            "title": "values",
-            "description": "Repeated field of dynamically typed values."
-          }
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/google.protobuf.Value"
         },
-        "title": "ListValue",
-        "additionalProperties": false,
-        "description": "`ListValue` is a wrapper around a repeated field of values.\n\n The JSON representation for `ListValue` is JSON array."
+        "description": "A JSON array whose elements may be any JSON value."
       },
       "google.protobuf.NullValue": {
         "type": "string",
@@ -163,29 +160,14 @@
         "enum": [
           "NULL_VALUE"
         ],
-        "description": "`NullValue` is a singleton enumeration to represent the null value for the\n `Value` type union.\n\n The JSON representation for `NullValue` is JSON `null`."
+        "description": "Represents a JSON `null`.\n\n `NullValue` is a sentinel, using an enum with only one value to represent\n the null value for the `Value` type union.\n\n A field of type `NullValue` with any value other than `0` is considered\n invalid. Most ProtoJSON serializers will emit a Value with a `null_value` set\n as a JSON `null` regardless of the integer value, and so will round trip to\n a `0` value."
       },
       "google.protobuf.Struct": {
         "type": "object",
         "additionalProperties": {
           "$ref": "#/components/schemas/google.protobuf.Value"
         },
-        "description": "`Struct` represents a structured data value, consisting of fields\n which map to dynamically typed values. In some languages, `Struct`\n might be supported by a native representation. For example, in\n scripting languages like JS a struct is represented as an\n object. The details of that representation are described together\n with the proto support for the language.\n\n The JSON representation for `Struct` is JSON object."
-      },
-      "google.protobuf.Struct.FieldsEntry": {
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string",
-            "title": "key"
-          },
-          "value": {
-            "title": "value",
-            "$ref": "#/components/schemas/google.protobuf.Value"
-          }
-        },
-        "title": "FieldsEntry",
-        "additionalProperties": false
+        "description": "A JSON object whose property values may be any JSON value."
       },
       "google.protobuf.Timestamp": {
         "type": "string",
@@ -194,7 +176,7 @@
           "2024-12-25T12:00:00Z"
         ],
         "format": "date-time",
-        "description": "A Timestamp represents a point in time independent of any time zone or local\n calendar, encoded as a count of seconds and fractions of seconds at\n nanosecond resolution. The count is relative to an epoch at UTC midnight on\n January 1, 1970, in the proleptic Gregorian calendar which extends the\n Gregorian calendar backwards to year one.\n\n All minutes are 60 seconds long. Leap seconds are \"smeared\" so that no leap\n second table is needed for interpretation, using a [24-hour linear\n smear](https://developers.google.com/time/smear).\n\n The range is from 0001-01-01T00:00:00Z to 9999-12-31T23:59:59.999999999Z. By\n restricting to that range, we ensure that we can convert to and from [RFC\n 3339](https://www.ietf.org/rfc/rfc3339.txt) date strings.\n\n # Examples\n\n Example 1: Compute Timestamp from POSIX `time()`.\n\n     Timestamp timestamp;\n     timestamp.set_seconds(time(NULL));\n     timestamp.set_nanos(0);\n\n Example 2: Compute Timestamp from POSIX `gettimeofday()`.\n\n     struct timeval tv;\n     gettimeofday(\u0026tv, NULL);\n\n     Timestamp timestamp;\n     timestamp.set_seconds(tv.tv_sec);\n     timestamp.set_nanos(tv.tv_usec * 1000);\n\n Example 3: Compute Timestamp from Win32 `GetSystemTimeAsFileTime()`.\n\n     FILETIME ft;\n     GetSystemTimeAsFileTime(\u0026ft);\n     UINT64 ticks = (((UINT64)ft.dwHighDateTime) \u003c\u003c 32) | ft.dwLowDateTime;\n\n     // A Windows tick is 100 nanoseconds. Windows epoch 1601-01-01T00:00:00Z\n     // is 11644473600 seconds before Unix epoch 1970-01-01T00:00:00Z.\n     Timestamp timestamp;\n     timestamp.set_seconds((INT64) ((ticks / 10000000) - 11644473600LL));\n     timestamp.set_nanos((INT32) ((ticks % 10000000) * 100));\n\n Example 4: Compute Timestamp from Java `System.currentTimeMillis()`.\n\n     long millis = System.currentTimeMillis();\n\n     Timestamp timestamp = Timestamp.newBuilder().setSeconds(millis / 1000)\n         .setNanos((int) ((millis % 1000) * 1000000)).build();\n\n Example 5: Compute Timestamp from Java `Instant.now()`.\n\n     Instant now = Instant.now();\n\n     Timestamp timestamp =\n         Timestamp.newBuilder().setSeconds(now.getEpochSecond())\n             .setNanos(now.getNano()).build();\n\n Example 6: Compute Timestamp from current time in Python.\n\n     timestamp = Timestamp()\n     timestamp.GetCurrentTime()\n\n # JSON Mapping\n\n In JSON format, the Timestamp type is encoded as a string in the\n [RFC 3339](https://www.ietf.org/rfc/rfc3339.txt) format. That is, the\n format is \"{year}-{month}-{day}T{hour}:{min}:{sec}[.{frac_sec}]Z\"\n where {year} is always expressed using four digits while {month}, {day},\n {hour}, {min}, and {sec} are zero-padded to two digits each. The fractional\n seconds, which can go up to 9 digits (i.e. up to 1 nanosecond resolution),\n are optional. The \"Z\" suffix indicates the timezone (\"UTC\"); the timezone\n is required. A proto3 JSON serializer should always use UTC (as indicated by\n \"Z\") when printing the Timestamp type and a proto3 JSON parser should be\n able to accept both UTC and other timezones (as indicated by an offset).\n\n For example, \"2017-01-15T01:30:15.01Z\" encodes 15.01 seconds past\n 01:30 UTC on January 15, 2017.\n\n In JavaScript, one can convert a Date object to this format using the\n standard\n [toISOString()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString)\n method. In Python, a standard `datetime.datetime` object can be converted\n to this format using\n [`strftime`](https://docs.python.org/2/library/time.html#time.strftime) with\n the time format spec '%Y-%m-%dT%H:%M:%S.%fZ'. Likewise, in Java, one can use\n the Joda Time's [`ISODateTimeFormat.dateTime()`](\n http://joda-time.sourceforge.net/apidocs/org/joda/time/format/ISODateTimeFormat.html#dateTime()\n ) to obtain a formatter capable of generating timestamps in this format."
+        "description": "A point in time in RFC 3339 format, with up to nanosecond precision. Output uses UTC (`Z`); input may use an offset from UTC."
       },
       "google.protobuf.Value": {
         "oneOf": [
@@ -218,7 +200,7 @@
             "additionalProperties": true
           }
         ],
-        "description": "`Value` represents a dynamically typed value which can be either\n null, a number, a string, a boolean, a recursive struct value, or a\n list of values. A producer of value is expected to set one of these\n variants. Absence of any variant indicates an error.\n\n The JSON representation for `Value` is JSON value."
+        "description": "Any JSON value: `null`, number, string, boolean, array, or object."
       },
       "mantrae.v1.Agent": {
         "type": "object",
@@ -228,10 +210,7 @@
             "title": "id"
           },
           "profileId": {
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "profile_id",
             "format": "int64"
           },
@@ -263,12 +242,20 @@
             "title": "containers"
           },
           "createdAt": {
-            "title": "created_at",
-            "$ref": "#/components/schemas/google.protobuf.Timestamp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Timestamp"
+              }
+            ],
+            "title": "created_at"
           },
           "updatedAt": {
-            "title": "updated_at",
-            "$ref": "#/components/schemas/google.protobuf.Timestamp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Timestamp"
+              }
+            ],
+            "title": "updated_at"
           }
         },
         "title": "Agent",
@@ -278,18 +265,12 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "id",
             "format": "int64"
           },
           "profileId": {
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "profile_id",
             "format": "int64"
           },
@@ -322,8 +303,12 @@
             "title": "details"
           },
           "createdAt": {
-            "title": "created_at",
-            "$ref": "#/components/schemas/google.protobuf.Timestamp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Timestamp"
+              }
+            ],
+            "title": "created_at"
           }
         },
         "title": "AuditLog",
@@ -337,16 +322,17 @@
             "title": "name"
           },
           "size": {
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "size",
             "format": "int64"
           },
           "createdAt": {
-            "title": "created_at",
-            "$ref": "#/components/schemas/google.protobuf.Timestamp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Timestamp"
+              }
+            ],
+            "title": "created_at"
           }
         },
         "title": "Backup",
@@ -389,43 +375,15 @@
             "title": "status"
           },
           "created": {
-            "title": "created",
-            "$ref": "#/components/schemas/google.protobuf.Timestamp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Timestamp"
+              }
+            ],
+            "title": "created"
           }
         },
         "title": "Container",
-        "additionalProperties": false
-      },
-      "mantrae.v1.Container.LabelsEntry": {
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "string",
-            "title": "key"
-          },
-          "value": {
-            "type": "string",
-            "title": "value"
-          }
-        },
-        "title": "LabelsEntry",
-        "additionalProperties": false
-      },
-      "mantrae.v1.Container.PortmapEntry": {
-        "type": "object",
-        "properties": {
-          "key": {
-            "type": "integer",
-            "title": "key",
-            "format": "int32"
-          },
-          "value": {
-            "type": "integer",
-            "title": "value",
-            "format": "int32"
-          }
-        },
-        "title": "PortmapEntry",
         "additionalProperties": false
       },
       "mantrae.v1.CreateAgentRequest": {
@@ -433,10 +391,7 @@
         "properties": {
           "profileId": {
             "exclusiveMinimum": 0,
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "profile_id",
             "format": "int64"
           }
@@ -448,8 +403,12 @@
         "type": "object",
         "properties": {
           "agent": {
-            "title": "agent",
-            "$ref": "#/components/schemas/mantrae.v1.Agent"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.Agent"
+              }
+            ],
+            "title": "agent"
           }
         },
         "title": "CreateAgentResponse",
@@ -474,12 +433,20 @@
             "minLength": 1
           },
           "type": {
-            "title": "type",
-            "$ref": "#/components/schemas/mantrae.v1.DNSProviderType"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.DNSProviderType"
+              }
+            ],
+            "title": "type"
           },
           "config": {
-            "title": "config",
-            "$ref": "#/components/schemas/mantrae.v1.DNSProviderConfig"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.DNSProviderConfig"
+              }
+            ],
+            "title": "config"
           },
           "isDefault": {
             "type": "boolean",
@@ -493,8 +460,12 @@
         "type": "object",
         "properties": {
           "dnsProvider": {
-            "title": "dns_provider",
-            "$ref": "#/components/schemas/mantrae.v1.DNSProvider"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.DNSProvider"
+              }
+            ],
+            "title": "dns_provider"
           }
         },
         "title": "CreateDNSProviderResponse",
@@ -505,10 +476,7 @@
         "properties": {
           "profileId": {
             "exclusiveMinimum": 0,
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "profile_id",
             "format": "int64"
           },
@@ -536,8 +504,12 @@
         "type": "object",
         "properties": {
           "entryPoint": {
-            "title": "entry_point",
-            "$ref": "#/components/schemas/mantrae.v1.EntryPoint"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.EntryPoint"
+              }
+            ],
+            "title": "entry_point"
           }
         },
         "title": "CreateEntryPointResponse",
@@ -548,10 +520,7 @@
         "properties": {
           "profileId": {
             "exclusiveMinimum": 0,
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "profile_id",
             "format": "int64"
           },
@@ -568,16 +537,24 @@
             "minLength": 1
           },
           "type": {
-            "title": "type",
-            "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+              }
+            ],
+            "title": "type"
           },
           "isDefault": {
             "type": "boolean",
             "title": "is_default"
           },
           "config": {
-            "title": "config",
-            "$ref": "#/components/schemas/google.protobuf.Struct"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Struct"
+              }
+            ],
+            "title": "config"
           }
         },
         "title": "CreateMiddlewareRequest",
@@ -587,8 +564,12 @@
         "type": "object",
         "properties": {
           "middleware": {
-            "title": "middleware",
-            "$ref": "#/components/schemas/mantrae.v1.Middleware"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.Middleware"
+              }
+            ],
+            "title": "middleware"
           }
         },
         "title": "CreateMiddlewareResponse",
@@ -617,8 +598,12 @@
         "type": "object",
         "properties": {
           "profile": {
-            "title": "profile",
-            "$ref": "#/components/schemas/mantrae.v1.Profile"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.Profile"
+              }
+            ],
+            "title": "profile"
           }
         },
         "title": "CreateProfileResponse",
@@ -629,10 +614,7 @@
         "properties": {
           "profileId": {
             "exclusiveMinimum": 0,
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "profile_id",
             "format": "int64"
           },
@@ -649,16 +631,24 @@
             "minLength": 1
           },
           "config": {
-            "title": "config",
-            "$ref": "#/components/schemas/google.protobuf.Struct"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Struct"
+              }
+            ],
+            "title": "config"
           },
           "enabled": {
             "type": "boolean",
             "title": "enabled"
           },
           "type": {
-            "title": "type",
-            "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+              }
+            ],
+            "title": "type"
           }
         },
         "title": "CreateRouterRequest",
@@ -668,8 +658,12 @@
         "type": "object",
         "properties": {
           "router": {
-            "title": "router",
-            "$ref": "#/components/schemas/mantrae.v1.Router"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.Router"
+              }
+            ],
+            "title": "router"
           }
         },
         "title": "CreateRouterResponse",
@@ -680,10 +674,7 @@
         "properties": {
           "profileId": {
             "exclusiveMinimum": 0,
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "profile_id",
             "format": "int64"
           },
@@ -700,16 +691,24 @@
             "minLength": 1
           },
           "config": {
-            "title": "config",
-            "$ref": "#/components/schemas/google.protobuf.Struct"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Struct"
+              }
+            ],
+            "title": "config"
           },
           "enabled": {
             "type": "boolean",
             "title": "enabled"
           },
           "type": {
-            "title": "type",
-            "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+              }
+            ],
+            "title": "type"
           }
         },
         "title": "CreateServersTransportRequest",
@@ -719,8 +718,12 @@
         "type": "object",
         "properties": {
           "serversTransport": {
-            "title": "servers_transport",
-            "$ref": "#/components/schemas/mantrae.v1.ServersTransport"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.ServersTransport"
+              }
+            ],
+            "title": "servers_transport"
           }
         },
         "title": "CreateServersTransportResponse",
@@ -731,10 +734,7 @@
         "properties": {
           "profileId": {
             "exclusiveMinimum": 0,
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "profile_id",
             "format": "int64"
           },
@@ -751,16 +751,24 @@
             "minLength": 1
           },
           "config": {
-            "title": "config",
-            "$ref": "#/components/schemas/google.protobuf.Struct"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Struct"
+              }
+            ],
+            "title": "config"
           },
           "enabled": {
             "type": "boolean",
             "title": "enabled"
           },
           "type": {
-            "title": "type",
-            "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+              }
+            ],
+            "title": "type"
           }
         },
         "title": "CreateServiceRequest",
@@ -770,8 +778,12 @@
         "type": "object",
         "properties": {
           "service": {
-            "title": "service",
-            "$ref": "#/components/schemas/mantrae.v1.Service"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.Service"
+              }
+            ],
+            "title": "service"
           }
         },
         "title": "CreateServiceResponse",
@@ -806,8 +818,12 @@
         "type": "object",
         "properties": {
           "user": {
-            "title": "user",
-            "$ref": "#/components/schemas/mantrae.v1.User"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.User"
+              }
+            ],
+            "title": "user"
           }
         },
         "title": "CreateUserResponse",
@@ -825,24 +841,40 @@
             "title": "name"
           },
           "type": {
-            "title": "type",
-            "$ref": "#/components/schemas/mantrae.v1.DNSProviderType"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.DNSProviderType"
+              }
+            ],
+            "title": "type"
           },
           "config": {
-            "title": "config",
-            "$ref": "#/components/schemas/mantrae.v1.DNSProviderConfig"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.DNSProviderConfig"
+              }
+            ],
+            "title": "config"
           },
           "isDefault": {
             "type": "boolean",
             "title": "is_default"
           },
           "createdAt": {
-            "title": "created_at",
-            "$ref": "#/components/schemas/google.protobuf.Timestamp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Timestamp"
+              }
+            ],
+            "title": "created_at"
           },
           "updatedAt": {
-            "title": "updated_at",
-            "$ref": "#/components/schemas/google.protobuf.Timestamp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Timestamp"
+              }
+            ],
+            "title": "updated_at"
           }
         },
         "title": "DNSProvider",
@@ -940,6 +972,12 @@
       "mantrae.v1.DeleteEntryPointRequest": {
         "type": "object",
         "properties": {
+          "profileId": {
+            "exclusiveMinimum": 0,
+            "type": "string",
+            "title": "profile_id",
+            "format": "int64"
+          },
           "id": {
             "type": "string",
             "title": "id",
@@ -957,14 +995,24 @@
       "mantrae.v1.DeleteMiddlewareRequest": {
         "type": "object",
         "properties": {
+          "profileId": {
+            "exclusiveMinimum": 0,
+            "type": "string",
+            "title": "profile_id",
+            "format": "int64"
+          },
           "id": {
             "type": "string",
             "title": "id",
             "minLength": 1
           },
           "type": {
-            "title": "type",
-            "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+              }
+            ],
+            "title": "type"
           }
         },
         "title": "DeleteMiddlewareRequest",
@@ -980,10 +1028,7 @@
         "properties": {
           "id": {
             "exclusiveMinimum": 0,
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "id",
             "format": "int64"
           }
@@ -999,14 +1044,24 @@
       "mantrae.v1.DeleteRouterRequest": {
         "type": "object",
         "properties": {
+          "profileId": {
+            "exclusiveMinimum": 0,
+            "type": "string",
+            "title": "profile_id",
+            "format": "int64"
+          },
           "id": {
             "type": "string",
             "title": "id",
             "minLength": 1
           },
           "type": {
-            "title": "type",
-            "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+              }
+            ],
+            "title": "type"
           }
         },
         "title": "DeleteRouterRequest",
@@ -1020,14 +1075,24 @@
       "mantrae.v1.DeleteServersTransportRequest": {
         "type": "object",
         "properties": {
+          "profileId": {
+            "exclusiveMinimum": 0,
+            "type": "string",
+            "title": "profile_id",
+            "format": "int64"
+          },
           "id": {
             "type": "string",
             "title": "id",
             "minLength": 1
           },
           "type": {
-            "title": "type",
-            "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+              }
+            ],
+            "title": "type"
           }
         },
         "title": "DeleteServersTransportRequest",
@@ -1041,14 +1106,24 @@
       "mantrae.v1.DeleteServiceRequest": {
         "type": "object",
         "properties": {
+          "profileId": {
+            "exclusiveMinimum": 0,
+            "type": "string",
+            "title": "profile_id",
+            "format": "int64"
+          },
           "id": {
             "type": "string",
             "title": "id",
             "minLength": 1
           },
           "type": {
-            "title": "type",
-            "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+              }
+            ],
+            "title": "type"
           }
         },
         "title": "DeleteServiceRequest",
@@ -1084,10 +1159,7 @@
             "title": "id"
           },
           "profileId": {
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "profile_id",
             "format": "int64"
           },
@@ -1104,12 +1176,20 @@
             "title": "is_default"
           },
           "createdAt": {
-            "title": "created_at",
-            "$ref": "#/components/schemas/google.protobuf.Timestamp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Timestamp"
+              }
+            ],
+            "title": "created_at"
           },
           "updatedAt": {
-            "title": "updated_at",
-            "$ref": "#/components/schemas/google.protobuf.Timestamp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Timestamp"
+              }
+            ],
+            "title": "updated_at"
           }
         },
         "title": "EntryPoint",
@@ -1131,8 +1211,12 @@
         "type": "object",
         "properties": {
           "agent": {
-            "title": "agent",
-            "$ref": "#/components/schemas/mantrae.v1.Agent"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.Agent"
+              }
+            ],
+            "title": "agent"
           }
         },
         "title": "GetAgentResponse",
@@ -1154,8 +1238,12 @@
         "type": "object",
         "properties": {
           "dnsProvider": {
-            "title": "dns_provider",
-            "$ref": "#/components/schemas/mantrae.v1.DNSProvider"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.DNSProvider"
+              }
+            ],
+            "title": "dns_provider"
           }
         },
         "title": "GetDNSProviderResponse",
@@ -1165,10 +1253,7 @@
         "type": "object",
         "properties": {
           "profileId": {
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "profile_id",
             "format": "int64"
           }
@@ -1190,6 +1275,12 @@
       "mantrae.v1.GetEntryPointRequest": {
         "type": "object",
         "properties": {
+          "profileId": {
+            "exclusiveMinimum": 0,
+            "type": "string",
+            "title": "profile_id",
+            "format": "int64"
+          },
           "id": {
             "type": "string",
             "title": "id",
@@ -1203,8 +1294,12 @@
         "type": "object",
         "properties": {
           "entryPoint": {
-            "title": "entry_point",
-            "$ref": "#/components/schemas/mantrae.v1.EntryPoint"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.EntryPoint"
+              }
+            ],
+            "title": "entry_point"
           }
         },
         "title": "GetEntryPointResponse",
@@ -1232,14 +1327,24 @@
       "mantrae.v1.GetMiddlewareRequest": {
         "type": "object",
         "properties": {
+          "profileId": {
+            "exclusiveMinimum": 0,
+            "type": "string",
+            "title": "profile_id",
+            "format": "int64"
+          },
           "id": {
             "type": "string",
             "title": "id",
             "minLength": 1
           },
           "type": {
-            "title": "type",
-            "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+              }
+            ],
+            "title": "type"
           }
         },
         "title": "GetMiddlewareRequest",
@@ -1249,8 +1354,12 @@
         "type": "object",
         "properties": {
           "middleware": {
-            "title": "middleware",
-            "$ref": "#/components/schemas/mantrae.v1.Middleware"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.Middleware"
+              }
+            ],
+            "title": "middleware"
           }
         },
         "title": "GetMiddlewareResponse",
@@ -1285,10 +1394,7 @@
         "properties": {
           "id": {
             "exclusiveMinimum": 0,
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "id",
             "format": "int64"
           }
@@ -1300,8 +1406,12 @@
         "type": "object",
         "properties": {
           "profile": {
-            "title": "profile",
-            "$ref": "#/components/schemas/mantrae.v1.Profile"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.Profile"
+              }
+            ],
+            "title": "profile"
           }
         },
         "title": "GetProfileResponse",
@@ -1330,14 +1440,24 @@
       "mantrae.v1.GetRouterRequest": {
         "type": "object",
         "properties": {
+          "profileId": {
+            "exclusiveMinimum": 0,
+            "type": "string",
+            "title": "profile_id",
+            "format": "int64"
+          },
           "id": {
             "type": "string",
             "title": "id",
             "minLength": 1
           },
           "type": {
-            "title": "type",
-            "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+              }
+            ],
+            "title": "type"
           }
         },
         "title": "GetRouterRequest",
@@ -1347,8 +1467,12 @@
         "type": "object",
         "properties": {
           "router": {
-            "title": "router",
-            "$ref": "#/components/schemas/mantrae.v1.Router"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.Router"
+              }
+            ],
+            "title": "router"
           }
         },
         "title": "GetRouterResponse",
@@ -1357,14 +1481,24 @@
       "mantrae.v1.GetServersTransportRequest": {
         "type": "object",
         "properties": {
+          "profileId": {
+            "exclusiveMinimum": 0,
+            "type": "string",
+            "title": "profile_id",
+            "format": "int64"
+          },
           "id": {
             "type": "string",
             "title": "id",
             "minLength": 1
           },
           "type": {
-            "title": "type",
-            "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+              }
+            ],
+            "title": "type"
           }
         },
         "title": "GetServersTransportRequest",
@@ -1374,8 +1508,12 @@
         "type": "object",
         "properties": {
           "serversTransport": {
-            "title": "servers_transport",
-            "$ref": "#/components/schemas/mantrae.v1.ServersTransport"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.ServersTransport"
+              }
+            ],
+            "title": "servers_transport"
           }
         },
         "title": "GetServersTransportResponse",
@@ -1385,46 +1523,13 @@
         "type": "object",
         "allOf": [
           {
-            "properties": {
-              "profileId": {
-                "exclusiveMinimum": 0,
-                "type": [
-                  "integer",
-                  "string"
-                ],
-                "title": "profile_id",
-                "format": "int64"
-              },
-              "type": {
-                "title": "type",
-                "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
-              }
-            }
-          },
-          {
             "oneOf": [
               {
-                "properties": {
-                  "id": {
-                    "type": "string",
-                    "title": "id",
-                    "minLength": 1
-                  }
-                },
-                "title": "id",
                 "required": [
                   "id"
                 ]
               },
               {
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "title": "name",
-                    "minLength": 1
-                  }
-                },
-                "title": "name",
                 "required": [
                   "name"
                 ]
@@ -1432,15 +1537,93 @@
             ]
           }
         ],
-        "title": "GetServiceRequest",
-        "additionalProperties": false
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "title": "id",
+                "minLength": 1
+              }
+            },
+            "title": "id"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "title": "name",
+                "minLength": 1
+              }
+            },
+            "title": "name"
+          }
+        ],
+        "unevaluatedProperties": false,
+        "not": {
+          "allOf": [
+            {
+              "anyOf": [
+                {
+                  "required": [
+                    "id"
+                  ]
+                },
+                {
+                  "required": [
+                    "name"
+                  ]
+                }
+              ]
+            },
+            {
+              "not": {
+                "oneOf": [
+                  {
+                    "required": [
+                      "id"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "name"
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "properties": {
+          "profileId": {
+            "exclusiveMinimum": 0,
+            "type": "string",
+            "title": "profile_id",
+            "format": "int64"
+          },
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+              }
+            ],
+            "title": "type"
+          }
+        },
+        "title": "GetServiceRequest"
       },
       "mantrae.v1.GetServiceResponse": {
         "type": "object",
         "properties": {
           "service": {
-            "title": "service",
-            "$ref": "#/components/schemas/mantrae.v1.Service"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.Service"
+              }
+            ],
+            "title": "service"
           }
         },
         "title": "GetServiceResponse",
@@ -1471,8 +1654,9 @@
       },
       "mantrae.v1.GetUserRequest": {
         "type": "object",
-        "oneOf": [
+        "anyOf": [
           {
+            "type": "object",
             "properties": {
               "email": {
                 "type": "string",
@@ -1480,12 +1664,10 @@
                 "format": "email"
               }
             },
-            "title": "email",
-            "required": [
-              "email"
-            ]
+            "title": "email"
           },
           {
+            "type": "object",
             "properties": {
               "id": {
                 "type": "string",
@@ -1493,12 +1675,10 @@
                 "minLength": 1
               }
             },
-            "title": "id",
-            "required": [
-              "id"
-            ]
+            "title": "id"
           },
           {
+            "type": "object",
             "properties": {
               "username": {
                 "type": "string",
@@ -1506,21 +1686,66 @@
                 "minLength": 3
               }
             },
-            "title": "username",
-            "required": [
-              "username"
-            ]
+            "title": "username"
           }
         ],
-        "title": "GetUserRequest",
-        "additionalProperties": false
+        "unevaluatedProperties": false,
+        "not": {
+          "allOf": [
+            {
+              "anyOf": [
+                {
+                  "required": [
+                    "email"
+                  ]
+                },
+                {
+                  "required": [
+                    "id"
+                  ]
+                },
+                {
+                  "required": [
+                    "username"
+                  ]
+                }
+              ]
+            },
+            {
+              "not": {
+                "oneOf": [
+                  {
+                    "required": [
+                      "email"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "id"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "username"
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "title": "GetUserRequest"
       },
       "mantrae.v1.GetUserResponse": {
         "type": "object",
         "properties": {
           "user": {
-            "title": "user",
-            "$ref": "#/components/schemas/mantrae.v1.User"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.User"
+              }
+            ],
+            "title": "user"
           }
         },
         "title": "GetUserResponse",
@@ -1575,8 +1800,12 @@
         "type": "object",
         "properties": {
           "agent": {
-            "title": "agent",
-            "$ref": "#/components/schemas/mantrae.v1.Agent"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.Agent"
+              }
+            ],
+            "title": "agent"
           }
         },
         "title": "HealthCheckResponse",
@@ -1587,16 +1816,12 @@
         "properties": {
           "profileId": {
             "exclusiveMinimum": 0,
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "profile_id",
             "format": "int64"
           },
           "limit": {
             "type": [
-              "integer",
               "string",
               "null"
             ],
@@ -1606,7 +1831,6 @@
           },
           "offset": {
             "type": [
-              "integer",
               "string",
               "null"
             ],
@@ -1629,10 +1853,7 @@
             "title": "agents"
           },
           "totalCount": {
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "total_count",
             "format": "int64"
           }
@@ -1645,7 +1866,6 @@
         "properties": {
           "limit": {
             "type": [
-              "integer",
               "string",
               "null"
             ],
@@ -1655,7 +1875,6 @@
           },
           "offset": {
             "type": [
-              "integer",
               "string",
               "null"
             ],
@@ -1678,10 +1897,7 @@
             "title": "audit_logs"
           },
           "totalCount": {
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "total_count",
             "format": "int64"
           }
@@ -1713,7 +1929,6 @@
         "properties": {
           "limit": {
             "type": [
-              "integer",
               "string",
               "null"
             ],
@@ -1723,7 +1938,6 @@
           },
           "offset": {
             "type": [
-              "integer",
               "string",
               "null"
             ],
@@ -1746,10 +1960,7 @@
             "title": "dns_providers"
           },
           "totalCount": {
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "total_count",
             "format": "int64"
           }
@@ -1762,16 +1973,12 @@
         "properties": {
           "profileId": {
             "exclusiveMinimum": 0,
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "profile_id",
             "format": "int64"
           },
           "limit": {
             "type": [
-              "integer",
               "string",
               "null"
             ],
@@ -1781,7 +1988,6 @@
           },
           "offset": {
             "type": [
-              "integer",
               "string",
               "null"
             ],
@@ -1804,10 +2010,7 @@
             "title": "entry_points"
           },
           "totalCount": {
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "total_count",
             "format": "int64"
           }
@@ -1820,10 +2023,7 @@
         "properties": {
           "profileId": {
             "exclusiveMinimum": 0,
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "profile_id",
             "format": "int64"
           },
@@ -1848,7 +2048,6 @@
           },
           "limit": {
             "type": [
-              "integer",
               "string",
               "null"
             ],
@@ -1858,7 +2057,6 @@
           },
           "offset": {
             "type": [
-              "integer",
               "string",
               "null"
             ],
@@ -1881,10 +2079,7 @@
             "title": "middlewares"
           },
           "totalCount": {
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "total_count",
             "format": "int64"
           }
@@ -1897,7 +2092,6 @@
         "properties": {
           "limit": {
             "type": [
-              "integer",
               "string",
               "null"
             ],
@@ -1907,7 +2101,6 @@
           },
           "offset": {
             "type": [
-              "integer",
               "string",
               "null"
             ],
@@ -1930,10 +2123,7 @@
             "title": "profiles"
           },
           "totalCount": {
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "total_count",
             "format": "int64"
           }
@@ -1946,10 +2136,7 @@
         "properties": {
           "profileId": {
             "exclusiveMinimum": 0,
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "profile_id",
             "format": "int64"
           },
@@ -1974,7 +2161,6 @@
           },
           "limit": {
             "type": [
-              "integer",
               "string",
               "null"
             ],
@@ -1984,7 +2170,6 @@
           },
           "offset": {
             "type": [
-              "integer",
               "string",
               "null"
             ],
@@ -2007,10 +2192,7 @@
             "title": "routers"
           },
           "totalCount": {
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "total_count",
             "format": "int64"
           }
@@ -2023,10 +2205,7 @@
         "properties": {
           "profileId": {
             "exclusiveMinimum": 0,
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "profile_id",
             "format": "int64"
           },
@@ -2051,7 +2230,6 @@
           },
           "limit": {
             "type": [
-              "integer",
               "string",
               "null"
             ],
@@ -2061,7 +2239,6 @@
           },
           "offset": {
             "type": [
-              "integer",
               "string",
               "null"
             ],
@@ -2084,10 +2261,7 @@
             "title": "servers_transports"
           },
           "totalCount": {
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "total_count",
             "format": "int64"
           }
@@ -2100,10 +2274,7 @@
         "properties": {
           "profileId": {
             "exclusiveMinimum": 0,
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "profile_id",
             "format": "int64"
           },
@@ -2128,7 +2299,6 @@
           },
           "limit": {
             "type": [
-              "integer",
               "string",
               "null"
             ],
@@ -2138,7 +2308,6 @@
           },
           "offset": {
             "type": [
-              "integer",
               "string",
               "null"
             ],
@@ -2161,10 +2330,7 @@
             "title": "services"
           },
           "totalCount": {
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "total_count",
             "format": "int64"
           }
@@ -2196,7 +2362,6 @@
         "properties": {
           "limit": {
             "type": [
-              "integer",
               "string",
               "null"
             ],
@@ -2206,7 +2371,6 @@
           },
           "offset": {
             "type": [
-              "integer",
               "string",
               "null"
             ],
@@ -2229,10 +2393,7 @@
             "title": "users"
           },
           "totalCount": {
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "total_count",
             "format": "int64"
           }
@@ -2244,50 +2405,90 @@
         "type": "object",
         "allOf": [
           {
-            "properties": {
-              "password": {
-                "type": "string",
-                "title": "password",
-                "minLength": 8
-              }
-            }
-          },
-          {
             "oneOf": [
               {
-                "properties": {
-                  "email": {
-                    "type": "string",
-                    "title": "email",
-                    "format": "email"
-                  }
-                },
-                "title": "email",
                 "required": [
-                  "email"
+                  "username"
                 ]
               },
               {
-                "properties": {
-                  "username": {
-                    "type": "string",
-                    "title": "username",
-                    "minLength": 3
-                  }
-                },
-                "title": "username",
                 "required": [
-                  "username"
+                  "email"
                 ]
               }
             ]
           }
         ],
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "string",
+                "title": "email",
+                "format": "email"
+              }
+            },
+            "title": "email"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "username": {
+                "type": "string",
+                "title": "username",
+                "minLength": 3
+              }
+            },
+            "title": "username"
+          }
+        ],
+        "unevaluatedProperties": false,
+        "not": {
+          "allOf": [
+            {
+              "anyOf": [
+                {
+                  "required": [
+                    "email"
+                  ]
+                },
+                {
+                  "required": [
+                    "username"
+                  ]
+                }
+              ]
+            },
+            {
+              "not": {
+                "oneOf": [
+                  {
+                    "required": [
+                      "email"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "username"
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "properties": {
+          "password": {
+            "type": "string",
+            "title": "password",
+            "minLength": 8
+          }
+        },
         "title": "LoginUserRequest",
         "required": [
           "password"
-        ],
-        "additionalProperties": false
+        ]
       },
       "mantrae.v1.LoginUserResponse": {
         "type": "object",
@@ -2318,10 +2519,7 @@
             "title": "id"
           },
           "profileId": {
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "profile_id",
             "format": "int64"
           },
@@ -2334,8 +2532,12 @@
             "title": "name"
           },
           "config": {
-            "title": "config",
-            "$ref": "#/components/schemas/google.protobuf.Struct"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Struct"
+              }
+            ],
+            "title": "config"
           },
           "enabled": {
             "type": "boolean",
@@ -2346,16 +2548,28 @@
             "title": "is_default"
           },
           "type": {
-            "title": "type",
-            "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+              }
+            ],
+            "title": "type"
           },
           "createdAt": {
-            "title": "created_at",
-            "$ref": "#/components/schemas/google.protobuf.Timestamp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Timestamp"
+              }
+            ],
+            "title": "created_at"
           },
           "updatedAt": {
-            "title": "updated_at",
-            "$ref": "#/components/schemas/google.protobuf.Timestamp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Timestamp"
+              }
+            ],
+            "title": "updated_at"
           }
         },
         "title": "Middleware",
@@ -2416,16 +2630,17 @@
             "title": "versions"
           },
           "stars": {
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "stars",
             "format": "int64"
           },
           "snippet": {
-            "title": "snippet",
-            "$ref": "#/components/schemas/mantrae.v1.PluginSnippet"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.PluginSnippet"
+              }
+            ],
+            "title": "snippet"
           },
           "createdAt": {
             "type": "string",
@@ -2458,10 +2673,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "id",
             "format": "int64"
           },
@@ -2478,12 +2690,20 @@
             "title": "token"
           },
           "createdAt": {
-            "title": "created_at",
-            "$ref": "#/components/schemas/google.protobuf.Timestamp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Timestamp"
+              }
+            ],
+            "title": "created_at"
           },
           "updatedAt": {
-            "title": "updated_at",
-            "$ref": "#/components/schemas/google.protobuf.Timestamp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Timestamp"
+              }
+            ],
+            "title": "updated_at"
           }
         },
         "title": "Profile",
@@ -2508,10 +2728,7 @@
             "minLength": 1
           },
           "profileId": {
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "profile_id",
             "format": "int64"
           }
@@ -2532,10 +2749,7 @@
             "title": "id"
           },
           "profileId": {
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "profile_id",
             "format": "int64"
           },
@@ -2548,16 +2762,24 @@
             "title": "name"
           },
           "config": {
-            "title": "config",
-            "$ref": "#/components/schemas/google.protobuf.Struct"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Struct"
+              }
+            ],
+            "title": "config"
           },
           "enabled": {
             "type": "boolean",
             "title": "enabled"
           },
           "type": {
-            "title": "type",
-            "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+              }
+            ],
+            "title": "type"
           },
           "dnsProviders": {
             "type": "array",
@@ -2567,12 +2789,20 @@
             "title": "dns_providers"
           },
           "createdAt": {
-            "title": "created_at",
-            "$ref": "#/components/schemas/google.protobuf.Timestamp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Timestamp"
+              }
+            ],
+            "title": "created_at"
           },
           "updatedAt": {
-            "title": "updated_at",
-            "$ref": "#/components/schemas/google.protobuf.Timestamp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Timestamp"
+              }
+            ],
+            "title": "updated_at"
           }
         },
         "title": "Router",
@@ -2586,10 +2816,7 @@
             "title": "id"
           },
           "profileId": {
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "profile_id",
             "format": "int64"
           },
@@ -2602,24 +2829,40 @@
             "title": "name"
           },
           "config": {
-            "title": "config",
-            "$ref": "#/components/schemas/google.protobuf.Struct"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Struct"
+              }
+            ],
+            "title": "config"
           },
           "enabled": {
             "type": "boolean",
             "title": "enabled"
           },
           "type": {
-            "title": "type",
-            "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+              }
+            ],
+            "title": "type"
           },
           "createdAt": {
-            "title": "created_at",
-            "$ref": "#/components/schemas/google.protobuf.Timestamp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Timestamp"
+              }
+            ],
+            "title": "created_at"
           },
           "updatedAt": {
-            "title": "updated_at",
-            "$ref": "#/components/schemas/google.protobuf.Timestamp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Timestamp"
+              }
+            ],
+            "title": "updated_at"
           }
         },
         "title": "ServersTransport",
@@ -2633,10 +2876,7 @@
             "title": "id"
           },
           "profileId": {
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "profile_id",
             "format": "int64"
           },
@@ -2653,20 +2893,36 @@
             "title": "enabled"
           },
           "config": {
-            "title": "config",
-            "$ref": "#/components/schemas/google.protobuf.Struct"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Struct"
+              }
+            ],
+            "title": "config"
           },
           "type": {
-            "title": "type",
-            "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+              }
+            ],
+            "title": "type"
           },
           "createdAt": {
-            "title": "created_at",
-            "$ref": "#/components/schemas/google.protobuf.Timestamp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Timestamp"
+              }
+            ],
+            "title": "created_at"
           },
           "updatedAt": {
-            "title": "updated_at",
-            "$ref": "#/components/schemas/google.protobuf.Timestamp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Timestamp"
+              }
+            ],
+            "title": "updated_at"
           }
         },
         "title": "Service",
@@ -2684,8 +2940,12 @@
             "title": "value"
           },
           "updatedAt": {
-            "title": "updated_at",
-            "$ref": "#/components/schemas/google.protobuf.Timestamp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Timestamp"
+              }
+            ],
+            "title": "updated_at"
           }
         },
         "title": "Setting",
@@ -2722,8 +2982,12 @@
         "type": "object",
         "properties": {
           "agent": {
-            "title": "agent",
-            "$ref": "#/components/schemas/mantrae.v1.Agent"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.Agent"
+              }
+            ],
+            "title": "agent"
           }
         },
         "title": "UpdateAgentResponse",
@@ -2743,12 +3007,20 @@
             "minLength": 1
           },
           "type": {
-            "title": "type",
-            "$ref": "#/components/schemas/mantrae.v1.DNSProviderType"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.DNSProviderType"
+              }
+            ],
+            "title": "type"
           },
           "config": {
-            "title": "config",
-            "$ref": "#/components/schemas/mantrae.v1.DNSProviderConfig"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.DNSProviderConfig"
+              }
+            ],
+            "title": "config"
           },
           "isDefault": {
             "type": "boolean",
@@ -2762,8 +3034,12 @@
         "type": "object",
         "properties": {
           "dnsProvider": {
-            "title": "dns_provider",
-            "$ref": "#/components/schemas/mantrae.v1.DNSProvider"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.DNSProvider"
+              }
+            ],
+            "title": "dns_provider"
           }
         },
         "title": "UpdateDNSProviderResponse",
@@ -2772,19 +3048,16 @@
       "mantrae.v1.UpdateEntryPointRequest": {
         "type": "object",
         "properties": {
+          "profileId": {
+            "exclusiveMinimum": 0,
+            "type": "string",
+            "title": "profile_id",
+            "format": "int64"
+          },
           "id": {
             "type": "string",
             "title": "id",
             "minLength": 1
-          },
-          "profileId": {
-            "exclusiveMinimum": 0,
-            "type": [
-              "integer",
-              "string"
-            ],
-            "title": "profile_id",
-            "format": "int64"
           },
           "name": {
             "type": "string",
@@ -2810,8 +3083,12 @@
         "type": "object",
         "properties": {
           "entryPoint": {
-            "title": "entry_point",
-            "$ref": "#/components/schemas/mantrae.v1.EntryPoint"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.EntryPoint"
+              }
+            ],
+            "title": "entry_point"
           }
         },
         "title": "UpdateEntryPointResponse",
@@ -2820,19 +3097,16 @@
       "mantrae.v1.UpdateMiddlewareRequest": {
         "type": "object",
         "properties": {
+          "profileId": {
+            "exclusiveMinimum": 0,
+            "type": "string",
+            "title": "profile_id",
+            "format": "int64"
+          },
           "id": {
             "type": "string",
             "title": "id",
             "minLength": 1
-          },
-          "profileId": {
-            "exclusiveMinimum": 0,
-            "type": [
-              "integer",
-              "string"
-            ],
-            "title": "profile_id",
-            "format": "int64"
           },
           "name": {
             "type": "string",
@@ -2840,12 +3114,20 @@
             "minLength": 1
           },
           "type": {
-            "title": "type",
-            "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+              }
+            ],
+            "title": "type"
           },
           "config": {
-            "title": "config",
-            "$ref": "#/components/schemas/google.protobuf.Struct"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Struct"
+              }
+            ],
+            "title": "config"
           },
           "enabled": {
             "type": "boolean",
@@ -2863,8 +3145,12 @@
         "type": "object",
         "properties": {
           "middleware": {
-            "title": "middleware",
-            "$ref": "#/components/schemas/mantrae.v1.Middleware"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.Middleware"
+              }
+            ],
+            "title": "middleware"
           }
         },
         "title": "UpdateMiddlewareResponse",
@@ -2875,10 +3161,7 @@
         "properties": {
           "id": {
             "exclusiveMinimum": 0,
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": "string",
             "title": "id",
             "format": "int64"
           },
@@ -2909,8 +3192,12 @@
         "type": "object",
         "properties": {
           "profile": {
-            "title": "profile",
-            "$ref": "#/components/schemas/mantrae.v1.Profile"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.Profile"
+              }
+            ],
+            "title": "profile"
           }
         },
         "title": "UpdateProfileResponse",
@@ -2919,6 +3206,12 @@
       "mantrae.v1.UpdateRouterRequest": {
         "type": "object",
         "properties": {
+          "profileId": {
+            "exclusiveMinimum": 0,
+            "type": "string",
+            "title": "profile_id",
+            "format": "int64"
+          },
           "id": {
             "type": "string",
             "title": "id",
@@ -2930,12 +3223,20 @@
             "minLength": 1
           },
           "type": {
-            "title": "type",
-            "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+              }
+            ],
+            "title": "type"
           },
           "config": {
-            "title": "config",
-            "$ref": "#/components/schemas/google.protobuf.Struct"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Struct"
+              }
+            ],
+            "title": "config"
           },
           "enabled": {
             "type": "boolean",
@@ -2956,8 +3257,12 @@
         "type": "object",
         "properties": {
           "router": {
-            "title": "router",
-            "$ref": "#/components/schemas/mantrae.v1.Router"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.Router"
+              }
+            ],
+            "title": "router"
           }
         },
         "title": "UpdateRouterResponse",
@@ -2966,6 +3271,12 @@
       "mantrae.v1.UpdateServersTransportRequest": {
         "type": "object",
         "properties": {
+          "profileId": {
+            "exclusiveMinimum": 0,
+            "type": "string",
+            "title": "profile_id",
+            "format": "int64"
+          },
           "id": {
             "type": "string",
             "title": "id",
@@ -2977,16 +3288,24 @@
             "minLength": 1
           },
           "config": {
-            "title": "config",
-            "$ref": "#/components/schemas/google.protobuf.Struct"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Struct"
+              }
+            ],
+            "title": "config"
           },
           "enabled": {
             "type": "boolean",
             "title": "enabled"
           },
           "type": {
-            "title": "type",
-            "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+              }
+            ],
+            "title": "type"
           }
         },
         "title": "UpdateServersTransportRequest",
@@ -2996,8 +3315,12 @@
         "type": "object",
         "properties": {
           "serversTransport": {
-            "title": "servers_transport",
-            "$ref": "#/components/schemas/mantrae.v1.ServersTransport"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.ServersTransport"
+              }
+            ],
+            "title": "servers_transport"
           }
         },
         "title": "UpdateServersTransportResponse",
@@ -3006,6 +3329,12 @@
       "mantrae.v1.UpdateServiceRequest": {
         "type": "object",
         "properties": {
+          "profileId": {
+            "exclusiveMinimum": 0,
+            "type": "string",
+            "title": "profile_id",
+            "format": "int64"
+          },
           "id": {
             "type": "string",
             "title": "id",
@@ -3021,12 +3350,20 @@
             "title": "enabled"
           },
           "config": {
-            "title": "config",
-            "$ref": "#/components/schemas/google.protobuf.Struct"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Struct"
+              }
+            ],
+            "title": "config"
           },
           "type": {
-            "title": "type",
-            "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.ProtocolType"
+              }
+            ],
+            "title": "type"
           }
         },
         "title": "UpdateServiceRequest",
@@ -3036,8 +3373,12 @@
         "type": "object",
         "properties": {
           "service": {
-            "title": "service",
-            "$ref": "#/components/schemas/mantrae.v1.Service"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.Service"
+              }
+            ],
+            "title": "service"
           }
         },
         "title": "UpdateServiceResponse",
@@ -3063,8 +3404,12 @@
         "type": "object",
         "properties": {
           "setting": {
-            "title": "setting",
-            "$ref": "#/components/schemas/mantrae.v1.Setting"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.Setting"
+              }
+            ],
+            "title": "setting"
           }
         },
         "title": "UpdateSettingResponse",
@@ -3107,8 +3452,12 @@
         "type": "object",
         "properties": {
           "user": {
-            "title": "user",
-            "$ref": "#/components/schemas/mantrae.v1.User"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/mantrae.v1.User"
+              }
+            ],
+            "title": "user"
           }
         },
         "title": "UpdateUserResponse",
@@ -3130,16 +3479,28 @@
             "title": "email"
           },
           "lastLogin": {
-            "title": "last_login",
-            "$ref": "#/components/schemas/google.protobuf.Timestamp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Timestamp"
+              }
+            ],
+            "title": "last_login"
           },
           "createdAt": {
-            "title": "created_at",
-            "$ref": "#/components/schemas/google.protobuf.Timestamp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Timestamp"
+              }
+            ],
+            "title": "created_at"
           },
           "updatedAt": {
-            "title": "updated_at",
-            "$ref": "#/components/schemas/google.protobuf.Timestamp"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/google.protobuf.Timestamp"
+              }
+            ],
+            "title": "updated_at"
           }
         },
         "title": "User",
@@ -3164,17 +3525,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -3222,17 +3587,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -3280,21 +3649,26 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           },
           {
             "name": "message",
             "in": "query",
+            "description": "The URL-encoded message query parameter contains the JSON or binary serialized request message",
             "content": {
               "application/json": {
                 "schema": {
@@ -3306,31 +3680,39 @@
           {
             "name": "encoding",
             "in": "query",
+            "description": "Define which encoding or 'Message-Codec' to use",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/encoding"
-            }
+            },
+            "example": "json"
           },
           {
             "name": "base64",
             "in": "query",
+            "description": "Specifies if the message query param is base64 encoded, which may be required for binary data",
             "schema": {
               "$ref": "#/components/schemas/base64"
-            }
+            },
+            "example": false
           },
           {
             "name": "compression",
             "in": "query",
+            "description": "Which compression algorithm to use for this request",
             "schema": {
               "$ref": "#/components/schemas/compression"
-            }
+            },
+            "example": "gzip"
           },
           {
             "name": "connect",
             "in": "query",
+            "description": "Define the version of the Connect protocol",
             "schema": {
               "$ref": "#/components/schemas/connect"
-            }
+            },
+            "example": "v1"
           }
         ],
         "responses": {
@@ -3366,17 +3748,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -3424,17 +3810,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -3482,21 +3872,26 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           },
           {
             "name": "message",
             "in": "query",
+            "description": "The URL-encoded message query parameter contains the JSON or binary serialized request message",
             "content": {
               "application/json": {
                 "schema": {
@@ -3508,31 +3903,39 @@
           {
             "name": "encoding",
             "in": "query",
+            "description": "Define which encoding or 'Message-Codec' to use",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/encoding"
-            }
+            },
+            "example": "json"
           },
           {
             "name": "base64",
             "in": "query",
+            "description": "Specifies if the message query param is base64 encoded, which may be required for binary data",
             "schema": {
               "$ref": "#/components/schemas/base64"
-            }
+            },
+            "example": false
           },
           {
             "name": "compression",
             "in": "query",
+            "description": "Which compression algorithm to use for this request",
             "schema": {
               "$ref": "#/components/schemas/compression"
-            }
+            },
+            "example": "gzip"
           },
           {
             "name": "connect",
             "in": "query",
+            "description": "Define the version of the Connect protocol",
             "schema": {
               "$ref": "#/components/schemas/connect"
-            }
+            },
+            "example": "v1"
           }
         ],
         "responses": {
@@ -3568,17 +3971,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -3626,17 +4033,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -3684,21 +4095,26 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           },
           {
             "name": "message",
             "in": "query",
+            "description": "The URL-encoded message query parameter contains the JSON or binary serialized request message",
             "content": {
               "application/json": {
                 "schema": {
@@ -3710,31 +4126,39 @@
           {
             "name": "encoding",
             "in": "query",
+            "description": "Define which encoding or 'Message-Codec' to use",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/encoding"
-            }
+            },
+            "example": "json"
           },
           {
             "name": "base64",
             "in": "query",
+            "description": "Specifies if the message query param is base64 encoded, which may be required for binary data",
             "schema": {
               "$ref": "#/components/schemas/base64"
-            }
+            },
+            "example": false
           },
           {
             "name": "compression",
             "in": "query",
+            "description": "Which compression algorithm to use for this request",
             "schema": {
               "$ref": "#/components/schemas/compression"
-            }
+            },
+            "example": "gzip"
           },
           {
             "name": "connect",
             "in": "query",
+            "description": "Define the version of the Connect protocol",
             "schema": {
               "$ref": "#/components/schemas/connect"
-            }
+            },
+            "example": "v1"
           }
         ],
         "responses": {
@@ -3770,17 +4194,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -3828,17 +4256,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -3887,17 +4319,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -3945,21 +4381,26 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           },
           {
             "name": "message",
             "in": "query",
+            "description": "The URL-encoded message query parameter contains the JSON or binary serialized request message",
             "content": {
               "application/json": {
                 "schema": {
@@ -3971,31 +4412,39 @@
           {
             "name": "encoding",
             "in": "query",
+            "description": "Define which encoding or 'Message-Codec' to use",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/encoding"
-            }
+            },
+            "example": "json"
           },
           {
             "name": "base64",
             "in": "query",
+            "description": "Specifies if the message query param is base64 encoded, which may be required for binary data",
             "schema": {
               "$ref": "#/components/schemas/base64"
-            }
+            },
+            "example": false
           },
           {
             "name": "compression",
             "in": "query",
+            "description": "Which compression algorithm to use for this request",
             "schema": {
               "$ref": "#/components/schemas/compression"
-            }
+            },
+            "example": "gzip"
           },
           {
             "name": "connect",
             "in": "query",
+            "description": "Define the version of the Connect protocol",
             "schema": {
               "$ref": "#/components/schemas/connect"
-            }
+            },
+            "example": "v1"
           }
         ],
         "responses": {
@@ -4031,17 +4480,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -4089,17 +4542,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -4147,17 +4604,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -4205,17 +4666,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -4263,21 +4728,26 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           },
           {
             "name": "message",
             "in": "query",
+            "description": "The URL-encoded message query parameter contains the JSON or binary serialized request message",
             "content": {
               "application/json": {
                 "schema": {
@@ -4289,31 +4759,39 @@
           {
             "name": "encoding",
             "in": "query",
+            "description": "Define which encoding or 'Message-Codec' to use",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/encoding"
-            }
+            },
+            "example": "json"
           },
           {
             "name": "base64",
             "in": "query",
+            "description": "Specifies if the message query param is base64 encoded, which may be required for binary data",
             "schema": {
               "$ref": "#/components/schemas/base64"
-            }
+            },
+            "example": false
           },
           {
             "name": "compression",
             "in": "query",
+            "description": "Which compression algorithm to use for this request",
             "schema": {
               "$ref": "#/components/schemas/compression"
-            }
+            },
+            "example": "gzip"
           },
           {
             "name": "connect",
             "in": "query",
+            "description": "Define the version of the Connect protocol",
             "schema": {
               "$ref": "#/components/schemas/connect"
-            }
+            },
+            "example": "v1"
           }
         ],
         "responses": {
@@ -4349,17 +4827,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -4407,21 +4889,26 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           },
           {
             "name": "message",
             "in": "query",
+            "description": "The URL-encoded message query parameter contains the JSON or binary serialized request message",
             "content": {
               "application/json": {
                 "schema": {
@@ -4433,31 +4920,39 @@
           {
             "name": "encoding",
             "in": "query",
+            "description": "Define which encoding or 'Message-Codec' to use",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/encoding"
-            }
+            },
+            "example": "json"
           },
           {
             "name": "base64",
             "in": "query",
+            "description": "Specifies if the message query param is base64 encoded, which may be required for binary data",
             "schema": {
               "$ref": "#/components/schemas/base64"
-            }
+            },
+            "example": false
           },
           {
             "name": "compression",
             "in": "query",
+            "description": "Which compression algorithm to use for this request",
             "schema": {
               "$ref": "#/components/schemas/compression"
-            }
+            },
+            "example": "gzip"
           },
           {
             "name": "connect",
             "in": "query",
+            "description": "Define the version of the Connect protocol",
             "schema": {
               "$ref": "#/components/schemas/connect"
-            }
+            },
+            "example": "v1"
           }
         ],
         "responses": {
@@ -4493,17 +4988,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -4551,17 +5050,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -4609,17 +5112,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -4667,17 +5174,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -4725,21 +5236,26 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           },
           {
             "name": "message",
             "in": "query",
+            "description": "The URL-encoded message query parameter contains the JSON or binary serialized request message",
             "content": {
               "application/json": {
                 "schema": {
@@ -4751,31 +5267,39 @@
           {
             "name": "encoding",
             "in": "query",
+            "description": "Define which encoding or 'Message-Codec' to use",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/encoding"
-            }
+            },
+            "example": "json"
           },
           {
             "name": "base64",
             "in": "query",
+            "description": "Specifies if the message query param is base64 encoded, which may be required for binary data",
             "schema": {
               "$ref": "#/components/schemas/base64"
-            }
+            },
+            "example": false
           },
           {
             "name": "compression",
             "in": "query",
+            "description": "Which compression algorithm to use for this request",
             "schema": {
               "$ref": "#/components/schemas/compression"
-            }
+            },
+            "example": "gzip"
           },
           {
             "name": "connect",
             "in": "query",
+            "description": "Define the version of the Connect protocol",
             "schema": {
               "$ref": "#/components/schemas/connect"
-            }
+            },
+            "example": "v1"
           }
         ],
         "responses": {
@@ -4811,17 +5335,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -4869,21 +5397,26 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           },
           {
             "name": "message",
             "in": "query",
+            "description": "The URL-encoded message query parameter contains the JSON or binary serialized request message",
             "content": {
               "application/json": {
                 "schema": {
@@ -4895,31 +5428,39 @@
           {
             "name": "encoding",
             "in": "query",
+            "description": "Define which encoding or 'Message-Codec' to use",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/encoding"
-            }
+            },
+            "example": "json"
           },
           {
             "name": "base64",
             "in": "query",
+            "description": "Specifies if the message query param is base64 encoded, which may be required for binary data",
             "schema": {
               "$ref": "#/components/schemas/base64"
-            }
+            },
+            "example": false
           },
           {
             "name": "compression",
             "in": "query",
+            "description": "Which compression algorithm to use for this request",
             "schema": {
               "$ref": "#/components/schemas/compression"
-            }
+            },
+            "example": "gzip"
           },
           {
             "name": "connect",
             "in": "query",
+            "description": "Define the version of the Connect protocol",
             "schema": {
               "$ref": "#/components/schemas/connect"
-            }
+            },
+            "example": "v1"
           }
         ],
         "responses": {
@@ -4955,17 +5496,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -5013,17 +5558,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -5071,17 +5620,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -5129,17 +5682,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -5187,21 +5744,26 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           },
           {
             "name": "message",
             "in": "query",
+            "description": "The URL-encoded message query parameter contains the JSON or binary serialized request message",
             "content": {
               "application/json": {
                 "schema": {
@@ -5213,31 +5775,39 @@
           {
             "name": "encoding",
             "in": "query",
+            "description": "Define which encoding or 'Message-Codec' to use",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/encoding"
-            }
+            },
+            "example": "json"
           },
           {
             "name": "base64",
             "in": "query",
+            "description": "Specifies if the message query param is base64 encoded, which may be required for binary data",
             "schema": {
               "$ref": "#/components/schemas/base64"
-            }
+            },
+            "example": false
           },
           {
             "name": "compression",
             "in": "query",
+            "description": "Which compression algorithm to use for this request",
             "schema": {
               "$ref": "#/components/schemas/compression"
-            }
+            },
+            "example": "gzip"
           },
           {
             "name": "connect",
             "in": "query",
+            "description": "Define the version of the Connect protocol",
             "schema": {
               "$ref": "#/components/schemas/connect"
-            }
+            },
+            "example": "v1"
           }
         ],
         "responses": {
@@ -5273,17 +5843,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -5331,21 +5905,26 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           },
           {
             "name": "message",
             "in": "query",
+            "description": "The URL-encoded message query parameter contains the JSON or binary serialized request message",
             "content": {
               "application/json": {
                 "schema": {
@@ -5357,31 +5936,39 @@
           {
             "name": "encoding",
             "in": "query",
+            "description": "Define which encoding or 'Message-Codec' to use",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/encoding"
-            }
+            },
+            "example": "json"
           },
           {
             "name": "base64",
             "in": "query",
+            "description": "Specifies if the message query param is base64 encoded, which may be required for binary data",
             "schema": {
               "$ref": "#/components/schemas/base64"
-            }
+            },
+            "example": false
           },
           {
             "name": "compression",
             "in": "query",
+            "description": "Which compression algorithm to use for this request",
             "schema": {
               "$ref": "#/components/schemas/compression"
-            }
+            },
+            "example": "gzip"
           },
           {
             "name": "connect",
             "in": "query",
+            "description": "Define the version of the Connect protocol",
             "schema": {
               "$ref": "#/components/schemas/connect"
-            }
+            },
+            "example": "v1"
           }
         ],
         "responses": {
@@ -5417,17 +6004,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -5475,21 +6066,26 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           },
           {
             "name": "message",
             "in": "query",
+            "description": "The URL-encoded message query parameter contains the JSON or binary serialized request message",
             "content": {
               "application/json": {
                 "schema": {
@@ -5501,31 +6097,39 @@
           {
             "name": "encoding",
             "in": "query",
+            "description": "Define which encoding or 'Message-Codec' to use",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/encoding"
-            }
+            },
+            "example": "json"
           },
           {
             "name": "base64",
             "in": "query",
+            "description": "Specifies if the message query param is base64 encoded, which may be required for binary data",
             "schema": {
               "$ref": "#/components/schemas/base64"
-            }
+            },
+            "example": false
           },
           {
             "name": "compression",
             "in": "query",
+            "description": "Which compression algorithm to use for this request",
             "schema": {
               "$ref": "#/components/schemas/compression"
-            }
+            },
+            "example": "gzip"
           },
           {
             "name": "connect",
             "in": "query",
+            "description": "Define the version of the Connect protocol",
             "schema": {
               "$ref": "#/components/schemas/connect"
-            }
+            },
+            "example": "v1"
           }
         ],
         "responses": {
@@ -5561,17 +6165,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -5619,17 +6227,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -5677,17 +6289,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -5735,17 +6351,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -5793,21 +6413,26 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           },
           {
             "name": "message",
             "in": "query",
+            "description": "The URL-encoded message query parameter contains the JSON or binary serialized request message",
             "content": {
               "application/json": {
                 "schema": {
@@ -5819,31 +6444,39 @@
           {
             "name": "encoding",
             "in": "query",
+            "description": "Define which encoding or 'Message-Codec' to use",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/encoding"
-            }
+            },
+            "example": "json"
           },
           {
             "name": "base64",
             "in": "query",
+            "description": "Specifies if the message query param is base64 encoded, which may be required for binary data",
             "schema": {
               "$ref": "#/components/schemas/base64"
-            }
+            },
+            "example": false
           },
           {
             "name": "compression",
             "in": "query",
+            "description": "Which compression algorithm to use for this request",
             "schema": {
               "$ref": "#/components/schemas/compression"
-            }
+            },
+            "example": "gzip"
           },
           {
             "name": "connect",
             "in": "query",
+            "description": "Define the version of the Connect protocol",
             "schema": {
               "$ref": "#/components/schemas/connect"
-            }
+            },
+            "example": "v1"
           }
         ],
         "responses": {
@@ -5879,17 +6512,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -5937,21 +6574,26 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           },
           {
             "name": "message",
             "in": "query",
+            "description": "The URL-encoded message query parameter contains the JSON or binary serialized request message",
             "content": {
               "application/json": {
                 "schema": {
@@ -5963,31 +6605,39 @@
           {
             "name": "encoding",
             "in": "query",
+            "description": "Define which encoding or 'Message-Codec' to use",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/encoding"
-            }
+            },
+            "example": "json"
           },
           {
             "name": "base64",
             "in": "query",
+            "description": "Specifies if the message query param is base64 encoded, which may be required for binary data",
             "schema": {
               "$ref": "#/components/schemas/base64"
-            }
+            },
+            "example": false
           },
           {
             "name": "compression",
             "in": "query",
+            "description": "Which compression algorithm to use for this request",
             "schema": {
               "$ref": "#/components/schemas/compression"
-            }
+            },
+            "example": "gzip"
           },
           {
             "name": "connect",
             "in": "query",
+            "description": "Define the version of the Connect protocol",
             "schema": {
               "$ref": "#/components/schemas/connect"
-            }
+            },
+            "example": "v1"
           }
         ],
         "responses": {
@@ -6023,17 +6673,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -6081,17 +6735,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -6139,17 +6797,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -6197,17 +6859,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -6255,21 +6921,26 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           },
           {
             "name": "message",
             "in": "query",
+            "description": "The URL-encoded message query parameter contains the JSON or binary serialized request message",
             "content": {
               "application/json": {
                 "schema": {
@@ -6281,31 +6952,39 @@
           {
             "name": "encoding",
             "in": "query",
+            "description": "Define which encoding or 'Message-Codec' to use",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/encoding"
-            }
+            },
+            "example": "json"
           },
           {
             "name": "base64",
             "in": "query",
+            "description": "Specifies if the message query param is base64 encoded, which may be required for binary data",
             "schema": {
               "$ref": "#/components/schemas/base64"
-            }
+            },
+            "example": false
           },
           {
             "name": "compression",
             "in": "query",
+            "description": "Which compression algorithm to use for this request",
             "schema": {
               "$ref": "#/components/schemas/compression"
-            }
+            },
+            "example": "gzip"
           },
           {
             "name": "connect",
             "in": "query",
+            "description": "Define the version of the Connect protocol",
             "schema": {
               "$ref": "#/components/schemas/connect"
-            }
+            },
+            "example": "v1"
           }
         ],
         "responses": {
@@ -6341,17 +7020,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -6399,21 +7082,26 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           },
           {
             "name": "message",
             "in": "query",
+            "description": "The URL-encoded message query parameter contains the JSON or binary serialized request message",
             "content": {
               "application/json": {
                 "schema": {
@@ -6425,31 +7113,39 @@
           {
             "name": "encoding",
             "in": "query",
+            "description": "Define which encoding or 'Message-Codec' to use",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/encoding"
-            }
+            },
+            "example": "json"
           },
           {
             "name": "base64",
             "in": "query",
+            "description": "Specifies if the message query param is base64 encoded, which may be required for binary data",
             "schema": {
               "$ref": "#/components/schemas/base64"
-            }
+            },
+            "example": false
           },
           {
             "name": "compression",
             "in": "query",
+            "description": "Which compression algorithm to use for this request",
             "schema": {
               "$ref": "#/components/schemas/compression"
-            }
+            },
+            "example": "gzip"
           },
           {
             "name": "connect",
             "in": "query",
+            "description": "Define the version of the Connect protocol",
             "schema": {
               "$ref": "#/components/schemas/connect"
-            }
+            },
+            "example": "v1"
           }
         ],
         "responses": {
@@ -6485,17 +7181,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -6543,17 +7243,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -6601,17 +7305,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -6659,17 +7367,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -6717,21 +7429,26 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           },
           {
             "name": "message",
             "in": "query",
+            "description": "The URL-encoded message query parameter contains the JSON or binary serialized request message",
             "content": {
               "application/json": {
                 "schema": {
@@ -6743,31 +7460,39 @@
           {
             "name": "encoding",
             "in": "query",
+            "description": "Define which encoding or 'Message-Codec' to use",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/encoding"
-            }
+            },
+            "example": "json"
           },
           {
             "name": "base64",
             "in": "query",
+            "description": "Specifies if the message query param is base64 encoded, which may be required for binary data",
             "schema": {
               "$ref": "#/components/schemas/base64"
-            }
+            },
+            "example": false
           },
           {
             "name": "compression",
             "in": "query",
+            "description": "Which compression algorithm to use for this request",
             "schema": {
               "$ref": "#/components/schemas/compression"
-            }
+            },
+            "example": "gzip"
           },
           {
             "name": "connect",
             "in": "query",
+            "description": "Define the version of the Connect protocol",
             "schema": {
               "$ref": "#/components/schemas/connect"
-            }
+            },
+            "example": "v1"
           }
         ],
         "responses": {
@@ -6803,17 +7528,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -6861,21 +7590,26 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           },
           {
             "name": "message",
             "in": "query",
+            "description": "The URL-encoded message query parameter contains the JSON or binary serialized request message",
             "content": {
               "application/json": {
                 "schema": {
@@ -6887,31 +7621,39 @@
           {
             "name": "encoding",
             "in": "query",
+            "description": "Define which encoding or 'Message-Codec' to use",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/encoding"
-            }
+            },
+            "example": "json"
           },
           {
             "name": "base64",
             "in": "query",
+            "description": "Specifies if the message query param is base64 encoded, which may be required for binary data",
             "schema": {
               "$ref": "#/components/schemas/base64"
-            }
+            },
+            "example": false
           },
           {
             "name": "compression",
             "in": "query",
+            "description": "Which compression algorithm to use for this request",
             "schema": {
               "$ref": "#/components/schemas/compression"
-            }
+            },
+            "example": "gzip"
           },
           {
             "name": "connect",
             "in": "query",
+            "description": "Define the version of the Connect protocol",
             "schema": {
               "$ref": "#/components/schemas/connect"
-            }
+            },
+            "example": "v1"
           }
         ],
         "responses": {
@@ -6947,17 +7689,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -7005,17 +7751,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -7063,17 +7813,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -7121,17 +7875,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -7179,21 +7937,26 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           },
           {
             "name": "message",
             "in": "query",
+            "description": "The URL-encoded message query parameter contains the JSON or binary serialized request message",
             "content": {
               "application/json": {
                 "schema": {
@@ -7205,31 +7968,39 @@
           {
             "name": "encoding",
             "in": "query",
+            "description": "Define which encoding or 'Message-Codec' to use",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/encoding"
-            }
+            },
+            "example": "json"
           },
           {
             "name": "base64",
             "in": "query",
+            "description": "Specifies if the message query param is base64 encoded, which may be required for binary data",
             "schema": {
               "$ref": "#/components/schemas/base64"
-            }
+            },
+            "example": false
           },
           {
             "name": "compression",
             "in": "query",
+            "description": "Which compression algorithm to use for this request",
             "schema": {
               "$ref": "#/components/schemas/compression"
-            }
+            },
+            "example": "gzip"
           },
           {
             "name": "connect",
             "in": "query",
+            "description": "Define the version of the Connect protocol",
             "schema": {
               "$ref": "#/components/schemas/connect"
-            }
+            },
+            "example": "v1"
           }
         ],
         "responses": {
@@ -7265,17 +8036,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -7323,21 +8098,26 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           },
           {
             "name": "message",
             "in": "query",
+            "description": "The URL-encoded message query parameter contains the JSON or binary serialized request message",
             "content": {
               "application/json": {
                 "schema": {
@@ -7349,31 +8129,39 @@
           {
             "name": "encoding",
             "in": "query",
+            "description": "Define which encoding or 'Message-Codec' to use",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/encoding"
-            }
+            },
+            "example": "json"
           },
           {
             "name": "base64",
             "in": "query",
+            "description": "Specifies if the message query param is base64 encoded, which may be required for binary data",
             "schema": {
               "$ref": "#/components/schemas/base64"
-            }
+            },
+            "example": false
           },
           {
             "name": "compression",
             "in": "query",
+            "description": "Which compression algorithm to use for this request",
             "schema": {
               "$ref": "#/components/schemas/compression"
-            }
+            },
+            "example": "gzip"
           },
           {
             "name": "connect",
             "in": "query",
+            "description": "Define the version of the Connect protocol",
             "schema": {
               "$ref": "#/components/schemas/connect"
-            }
+            },
+            "example": "v1"
           }
         ],
         "responses": {
@@ -7409,17 +8197,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -7467,17 +8259,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -7525,21 +8321,26 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           },
           {
             "name": "message",
             "in": "query",
+            "description": "The URL-encoded message query parameter contains the JSON or binary serialized request message",
             "content": {
               "application/json": {
                 "schema": {
@@ -7551,31 +8352,39 @@
           {
             "name": "encoding",
             "in": "query",
+            "description": "Define which encoding or 'Message-Codec' to use",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/encoding"
-            }
+            },
+            "example": "json"
           },
           {
             "name": "base64",
             "in": "query",
+            "description": "Specifies if the message query param is base64 encoded, which may be required for binary data",
             "schema": {
               "$ref": "#/components/schemas/base64"
-            }
+            },
+            "example": false
           },
           {
             "name": "compression",
             "in": "query",
+            "description": "Which compression algorithm to use for this request",
             "schema": {
               "$ref": "#/components/schemas/compression"
-            }
+            },
+            "example": "gzip"
           },
           {
             "name": "connect",
             "in": "query",
+            "description": "Define the version of the Connect protocol",
             "schema": {
               "$ref": "#/components/schemas/connect"
-            }
+            },
+            "example": "v1"
           }
         ],
         "responses": {
@@ -7611,17 +8420,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -7669,21 +8482,26 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           },
           {
             "name": "message",
             "in": "query",
+            "description": "The URL-encoded message query parameter contains the JSON or binary serialized request message",
             "content": {
               "application/json": {
                 "schema": {
@@ -7695,31 +8513,39 @@
           {
             "name": "encoding",
             "in": "query",
+            "description": "Define which encoding or 'Message-Codec' to use",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/encoding"
-            }
+            },
+            "example": "json"
           },
           {
             "name": "base64",
             "in": "query",
+            "description": "Specifies if the message query param is base64 encoded, which may be required for binary data",
             "schema": {
               "$ref": "#/components/schemas/base64"
-            }
+            },
+            "example": false
           },
           {
             "name": "compression",
             "in": "query",
+            "description": "Which compression algorithm to use for this request",
             "schema": {
               "$ref": "#/components/schemas/compression"
-            }
+            },
+            "example": "gzip"
           },
           {
             "name": "connect",
             "in": "query",
+            "description": "Define the version of the Connect protocol",
             "schema": {
               "$ref": "#/components/schemas/connect"
-            }
+            },
+            "example": "v1"
           }
         ],
         "responses": {
@@ -7755,17 +8581,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -7813,17 +8643,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -7871,17 +8705,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -7929,17 +8767,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -7987,17 +8829,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -8045,21 +8891,26 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           },
           {
             "name": "message",
             "in": "query",
+            "description": "The URL-encoded message query parameter contains the JSON or binary serialized request message",
             "content": {
               "application/json": {
                 "schema": {
@@ -8071,31 +8922,39 @@
           {
             "name": "encoding",
             "in": "query",
+            "description": "Define which encoding or 'Message-Codec' to use",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/encoding"
-            }
+            },
+            "example": "json"
           },
           {
             "name": "base64",
             "in": "query",
+            "description": "Specifies if the message query param is base64 encoded, which may be required for binary data",
             "schema": {
               "$ref": "#/components/schemas/base64"
-            }
+            },
+            "example": false
           },
           {
             "name": "compression",
             "in": "query",
+            "description": "Which compression algorithm to use for this request",
             "schema": {
               "$ref": "#/components/schemas/compression"
-            }
+            },
+            "example": "gzip"
           },
           {
             "name": "connect",
             "in": "query",
+            "description": "Define the version of the Connect protocol",
             "schema": {
               "$ref": "#/components/schemas/connect"
-            }
+            },
+            "example": "v1"
           }
         ],
         "responses": {
@@ -8131,17 +8990,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -8189,21 +9052,26 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           },
           {
             "name": "message",
             "in": "query",
+            "description": "The URL-encoded message query parameter contains the JSON or binary serialized request message",
             "content": {
               "application/json": {
                 "schema": {
@@ -8215,31 +9083,39 @@
           {
             "name": "encoding",
             "in": "query",
+            "description": "Define which encoding or 'Message-Codec' to use",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/encoding"
-            }
+            },
+            "example": "json"
           },
           {
             "name": "base64",
             "in": "query",
+            "description": "Specifies if the message query param is base64 encoded, which may be required for binary data",
             "schema": {
               "$ref": "#/components/schemas/base64"
-            }
+            },
+            "example": false
           },
           {
             "name": "compression",
             "in": "query",
+            "description": "Which compression algorithm to use for this request",
             "schema": {
               "$ref": "#/components/schemas/compression"
-            }
+            },
+            "example": "gzip"
           },
           {
             "name": "connect",
             "in": "query",
+            "description": "Define the version of the Connect protocol",
             "schema": {
               "$ref": "#/components/schemas/connect"
-            }
+            },
+            "example": "v1"
           }
         ],
         "responses": {
@@ -8275,17 +9151,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -8333,17 +9213,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -8391,17 +9275,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -8449,17 +9337,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -8507,17 +9399,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -8565,17 +9461,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {
@@ -8623,17 +9523,21 @@
           {
             "name": "Connect-Protocol-Version",
             "in": "header",
+            "description": "Define the version of the Connect protocol",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/connect-protocol-version"
-            }
+            },
+            "example": 1
           },
           {
             "name": "Connect-Timeout-Ms",
             "in": "header",
+            "description": "Define the timeout, in ms",
             "schema": {
               "$ref": "#/components/schemas/connect-timeout-header"
-            }
+            },
+            "example": 1000
           }
         ],
         "requestBody": {

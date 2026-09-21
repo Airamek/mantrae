@@ -209,6 +209,23 @@
 		</div>
 	</div>
 
+	{#if config.tls}
+		<div class="flex items-center justify-between rounded-lg border p-3">
+			<div class="space-y-1">
+				<Label class="text-sm">Disable TLS 1.3</Label>
+				<p class="text-xs text-muted-foreground">Restrict this host to TLS 1.2</p>
+			</div>
+
+			<CustomSwitch
+				checked={config.tls.options === 'tls12'}
+				onCheckedChange={(checked) => {
+					if (!config.tls) config.tls = {} as RouterTLSConfig;
+					config.tls.options = checked ? 'tls12' : undefined;
+				}}
+			/>
+		</div>
+	{/if}
+
 	<!-- Rule -->
 	{#if data.type === ProtocolType.HTTP}
 		<RuleEditor bind:rule={config.rule} bind:type={data.type} />

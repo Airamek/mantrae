@@ -10,9 +10,12 @@ import (
 	"github.com/google/uuid"
 	"github.com/mizuchilabs/mantrae/internal/storage"
 	"github.com/mizuchilabs/mantrae/internal/store/db"
+	traefiktls "github.com/traefik/traefik/v3/pkg/tls"
 	"github.com/traefik/traefik/v3/pkg/config/dynamic"
 	"gopkg.in/yaml.v3"
 )
+
+const tls12OptionName = "tls12"
 
 // BuildDynamicConfig builds a Traefik configuration from the database
 func BuildDynamicConfig(
@@ -89,6 +92,16 @@ func BuildDynamicConfig(
 
 	for _, r := range httpRouters {
 		cfg.HTTP.Routers[r.Name] = r.Config.Data
+		if r.Config.Data.TLS != nil && r.Config.Data.TLS.Options == tls12OptionName {
+			cfg.TLS = &dynamic.TLSConfiguration{
+				Options: map[string]traefiktls.Options{
+					tls12OptionName: {
+						MinVersion: "VersionTLS12",
+						MaxVersion: "VersionTLS12",
+					},
+				},
+			}
+		}
 	}
 	for _, r := range tcpRouters {
 		cfg.TCP.Routers[r.Name] = r.Config.Data
