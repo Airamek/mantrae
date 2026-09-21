@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import * as Popover from '$lib/components/ui/popover/index.js';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import type { Profile } from '$lib/gen/mantrae/v1/profile_pb';
-	import { RotateCcw } from '@lucide/svelte';
+	import { RotateCcw, Trash2, TriangleAlert } from '@lucide/svelte';
 	import Separator from '../ui/separator/separator.svelte';
 	import { CopyInput } from '../ui/input-group';
 	import { profile } from '$lib/api/profiles.svelte';
@@ -27,12 +28,14 @@
 	const serverURL = setting.get('server_url');
 	const createMutation = profile.create();
 	const updateMutation = profile.update();
+	const deleteMutation = profile.delete();
 	function onsubmit() {
 		if (profileData.id) {
 			updateMutation.mutate({ ...profileData });
 		} else {
 			createMutation.mutate({ ...profileData });
 		}
+		open = false;
 	}
 
 	let newProfile = $derived(profile.get(profileData.id));
@@ -97,7 +100,50 @@
 
 			<Separator />
 
-			<Button type="submit" class="w-full">{profileData.id ? 'Update' : 'Create'}</Button>
+			<div class="flex w-full gap-2">
+				{#if profileData.id}
+					<Popover.Root>
+						<Popover.Trigger>
+							<Button type="button" variant="destructive">
+								<Trash2 size={16} />
+							</Button>
+						</Popover.Trigger>
+						<Popover.Content class="w-80" align="end">
+							<div class="space-y-4">
+								<div class="flex items-start gap-3">
+									<div
+										class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-destructive/10"
+									>
+										<TriangleAlert class="h-4 w-4 text-destructive" />
+									</div>
+									<div class="flex-1 space-y-2">
+										<h4 class="text-sm leading-none font-semibold">Delete Profile</h4>
+										<p class="text-sm leading-relaxed text-muted-foreground">
+											Are you sure you want to delete this profile?
+										</p>
+									</div>
+								</div>
+								<div class="flex items-center justify-end gap-2">
+									<Button type="button" variant="outline">Cancel</Button>
+									<Button
+										type="button"
+										variant="destructive"
+										onclick={() => {
+											deleteMutation.mutate({ id: profileData.id });
+											open = false;
+										}}
+									>
+										Delete
+									</Button>
+								</div>
+							</div>
+						</Popover.Content>
+					</Popover.Root>
+				{/if}
+				<Button type="submit" class="flex-1">
+					{profileData.id ? 'Update' : 'Create'}
+				</Button>
+			</div>
 		</form>
 	</Dialog.Content>
 </Dialog.Root>
