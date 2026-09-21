@@ -54,7 +54,6 @@ export type Router = Router & {
   observability?: RouterObservabilityConfig | undefined,
 }
 const RouterSchemaShape = {
-  ...RouterSchema.shape,
   entryPoints: z.string().array().optional(),
   middlewares: z.string().array().optional(),
   service: z.string().optional(),

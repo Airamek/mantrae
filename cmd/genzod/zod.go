@@ -32,6 +32,7 @@ func main() {
 
 	for _, strct := range types {
 		schema := zen.StructToZodSchema(strct, zen.WithCustomTypes(customTypeHandlers))
+		schema = strings.Replace(schema, "  ...RouterSchema.shape,\n", "", 1)
 		fmt.Fprintf(&builder, "%s\n", schema)
 	}
 
