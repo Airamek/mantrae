@@ -98,6 +98,9 @@ func BuildDynamicConfig(
 					tls12OptionName: {
 						MinVersion: "VersionTLS12",
 						MaxVersion: "VersionTLS12",
+						ClientAuth: traefiktls.ClientAuth{
+							ClientAuthType: "NoClientCert",
+						},
 					},
 				},
 			}
