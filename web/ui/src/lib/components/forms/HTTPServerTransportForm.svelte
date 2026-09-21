@@ -85,6 +85,21 @@
 
 		<div class="flex items-center justify-between rounded-lg border p-3">
 			<div class="space-y-1">
+				<Label class="text-sm">Use TLS 1.2 for backend</Label>
+				<p class="text-xs text-muted-foreground">Use TLS 1.2 when connecting to backend servers</p>
+			</div>
+
+			<CustomSwitch
+				checked={config.minVersion === 'VersionTLS12' && config.maxVersion === 'VersionTLS12'}
+				onCheckedChange={(checked) => {
+					config.minVersion = checked ? 'VersionTLS12' : undefined;
+					config.maxVersion = checked ? 'VersionTLS12' : undefined;
+				}}
+			/>
+		</div>
+
+		<div class="flex items-center justify-between rounded-lg border p-3">
+			<div class="space-y-1">
 				<Label class="text-sm">Disable HTTP/2</Label>
 				<p class="text-xs text-muted-foreground">Disable HTTP/2</p>
 			</div>
