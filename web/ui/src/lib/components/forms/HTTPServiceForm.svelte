@@ -13,7 +13,7 @@
 		type ServersLoadBalancer
 	} from '$lib/gen/zen/traefik-schemas';
 	import { ChevronDown, Plus, Trash } from '@lucide/svelte';
-	import { marshalConfig } from '$lib/types';
+	import { marshalConfig, unmarshalConfig } from '$lib/types';
 	import CustomSwitch from '../ui/custom-switch/custom-switch.svelte';
 	import { Separator } from '../ui/separator';
 	import { transport } from '$lib/api/transport.svelte';
@@ -53,7 +53,7 @@
 
 	$effect(() => {
 		if (service.config) {
-			let config = service.config as HTTPService;
+			let config = unmarshalConfig(service.config) as HTTPService;
 			servers = config.loadBalancer?.servers || [];
 			passHostHeader = config.loadBalancer?.passHostHeader ?? true;
 			sticky = !!config.loadBalancer?.sticky?.cookie;
